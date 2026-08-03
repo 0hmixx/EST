@@ -179,7 +179,7 @@
   .app-layout{
     display:grid;
     grid-template-columns:240px 1fr;
-    gap:0;
+    gap:16px;
     min-height:calc(100vh - 140px);
   }
   .sidebar{
@@ -366,7 +366,7 @@
     padding:28px;
     display:grid;
     grid-template-columns:340px 1fr;
-    gap:28px;
+    gap:32px;
     min-height:400px;
   }
   @media(max-width:900px){.panel{grid-template-columns:1fr;}}
@@ -3247,6 +3247,13 @@ function renderPanel(){
   }
 
   if(activeTab === 'admin'){
+    if(!currentUser || currentUser.email !== ADMIN_EMAIL){
+      activeTab = 'excavation';
+      renderTabs();
+      renderPanel();
+      showToast('Access denied.','error');
+      return;
+    }
     panel.style.gridTemplateColumns = '1fr';
     const content = document.createElement('div');
     content.innerHTML = `<h2>Admin Panel</h2><div class="desc">Manage users, access, and activity.</div>`;
