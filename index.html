@@ -2321,10 +2321,11 @@ const modules = {
         ];
       }
       if(v.type==='column'){
+        const colCount = v.colCount > 0 ? v.colCount : 1;
         const barLen = v.colH * waste;
         const kgPerM_main = (v.mainDia*v.mainDia)/162;
         const kgPerM_tie = (v.tieDia*v.tieDia)/162;
-        const mainWeight = barLen * v.mainCount * kgPerM_main;
+        const mainWeightPerCol = barLen * v.mainCount * kgPerM_main;
         const tiePerimeter = 2*((v.b - 2*c.concreteCover) + (v.d - 2*c.concreteCover))/1000 + 24*v.tieDia/1000;
         const lowerZone = v.colH * 0.3;
         const upperZone = v.colH * 0.3;
@@ -2334,15 +2335,22 @@ const modules = {
         const tiesLower = Math.ceil(lowerZone*1000/tieSpacing) + 1;
         const tiesUpper = Math.ceil(upperZone*1000/tieSpacingUpper) + 1;
         const tiesMid = midZone > 0 ? Math.ceil(midZone*1000/200) + 1 : 0;
-        const totalTies = tiesLower + tiesUpper + tiesMid;
-        const tieWeight = totalTies * tiePerimeter * kgPerM_tie;
-        const totalWeight = mainWeight + tieWeight;
-        const mainBarCount = Math.ceil((v.colH*waste) / stockLen) * v.mainCount;
+        const tiesPerCol = tiesLower + tiesUpper + tiesMid;
+        const tieWeightPerCol = tiesPerCol * tiePerimeter * kgPerM_tie;
+        const totalWeightPerCol = mainWeightPerCol + tieWeightPerCol;
+        const mainBarCountPerCol = Math.ceil((v.colH*waste) / stockLen) * v.mainCount;
+        // Multiply all by column count
+        const mainBarCount = mainBarCountPerCol * colCount;
+        const totalTies = tiesPerCol * colCount;
+        const totalWeight = totalWeightPerCol * colCount;
+        const tieWire = totalWeight * c.tieWirePerKg;
         return [
           {item:`Main bars (${v.mainDia}mm × ${stockLen}m ea.)`, qty:mainBarCount, unit:'pcs'},
-          {item:'Ties', qty:totalTies, unit:'pcs'},
-          {item:'Total column rebar weight', qty:totalWeight, unit:'kg'},
-          {item:'Tie wire', qty:totalWeight*c.tieWirePerKg, unit:'kg'},
+          {item:'Main bars total length', qty:barLen * v.mainCount * colCount, unit:'running m', hidden:true},
+          {item:'Ties / stirrups', qty:totalTies, unit:'pcs'},
+          {item:'Ties total length', qty:tiesPerCol * tiePerimeter * colCount, unit:'running m', hidden:true},
+          {item:'Total rebar weight', qty:totalWeight, unit:'kg'},
+          {item:'Tie wire', qty:tieWire, unit:'kg'},
         ];
       }
       if(v.type==='slab'){
