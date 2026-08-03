@@ -1622,7 +1622,7 @@
         <span>Secure project-based access</span>
       </div>
     </div>
-    <div class="login-reference">Based on Max B. Fajardo's Simplified Construction Estimate</div>
+    <div class="login-reference">Construction cost estimating tool</div>
   </div>
 </div>
 
@@ -1661,7 +1661,7 @@
         <div class="logo">E</div>
         <div>
           <div class="app-name">Estimator</div>
-          <div class="app-ver">v2.0 — Fajardo</div>
+          <div class="app-ver">v2.0</div>
         </div>
       </div>
 
@@ -1696,13 +1696,13 @@
           </div>
           <div class="current-module" id="currentModule">Excavation</div>
           <div class="header-secondary">
-            <span>Ref. Max B. Fajardo</span>
             <span>SI Units</span>
             <span>₱ PHP</span>
           </div>
         </div>
         <div class="header-right">
           <div class="header-actions">
+            <button class="btn ghost small" id="previewPdfBtn" onclick="previewPDF()">Preview</button>
             <button class="btn ghost small" id="exportPdfBtn" onclick="exportPDF()">Export PDF</button>
             <button class="btn ghost small" id="exportExcelBtn" onclick="exportExcel()">Export Excel</button>
             <button class="btn small" id="newProjectBtn" style="display:none;">+ New Project</button>
@@ -1755,6 +1755,7 @@
           <div class="estimate-footer-hint">Edit unit costs to price out each line.</div>
           <div class="estimate-footer-actions">
             <button class="btn ghost" onclick="clearLedger()">Clear All</button>
+            <button class="btn ghost" onclick="previewPDF()">Preview</button>
             <button class="btn ghost" onclick="exportPDF()">Export PDF</button>
             <button class="btn ghost" onclick="exportExcel()">Export Excel</button>
           </div>
@@ -2232,7 +2233,7 @@ const modules = {
   paint: {
     label:'Painting',
     title:'Painting Works',
-    desc:'Paint, primer, and materials for a surface area based on Fajardo reference.',
+    desc:'Paint, primer, and materials for a surface area.',
     fields:[
       {id:'area', label:'Surface area', unit:'sq.m.', def:0},
       {id:'surface', label:'Surface type', type:'select', options:[
@@ -2514,7 +2515,7 @@ const modules = {
   formwork: {
     label:'Form/Scaffold',
     title:'Formwork, Scaffolding & Staging',
-    desc:'Contact area for formwork, floor area for scaffolding, and support area for staging based on Fajardo reference.',
+    desc:'Contact area for formwork, floor area for scaffolding, and support area for staging.',
     fields:[
       {id:'type', label:'Type', type:'select', options:[
         {v:'formBeam', t:'Formwork — Beam'},
@@ -3803,8 +3804,8 @@ function clearLedger(){
 }
 
 /* ---------------- export PDF ---------------- */
-function exportPDF(){
-  if(ledger.length===0){showToast('No items in estimate.','warning'); return;}
+function generatePDF(){
+  if(ledger.length===0){showToast('No items in estimate.','warning'); return null;}
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF();
   
@@ -4087,8 +4088,20 @@ function exportPDF(){
     doc.text('Page ' + p + ' of ' + totalPages, pageW - marginR, fY, {align:'right'});
   }
   
-  doc.save(filename);
-  showToast('PDF estimate generated', 'success');
+  return {doc, filename};
+}
+
+function exportPDF(){
+  const result = generatePDF();
+  if(!result) return;
+  result.doc.save(result.filename);
+  showToast('PDF estimate downloaded', 'success');
+}
+
+function previewPDF(){
+  const result = generatePDF();
+  if(!result) return;
+  result.doc.output('dataurlnewwindow');
 }
 
 function fmtPeso(n){
@@ -4186,8 +4199,9 @@ function exportExcel(){
   boqRows.push(['']);
   boqRows.push(['Item No.', 'Category', 'Description', 'Quantity', 'Unit', 'Unit Cost', 'Amount']);
   
-  let grandTotalCheck = 0;
   let modIdx = 0;
+  let dataRowStart = 6; // first data row (0-indexed row 5 = row 6 in Excel)
+  let dataRowEnd = 5;
   
   modOrder.forEach(mod => {
     if(!modules[mod] || modules[mod].length === 0) return;
@@ -4198,8 +4212,7 @@ function exportExcel(){
     boqRows.push([String.fromCharCode(65 + modIdx), label.toUpperCase(), '', '', '', '', '']);
     
     items.forEach((item, i) => {
-      const amount = item.qty * item.cost;
-      grandTotalCheck += amount;
+      dataRowEnd++;
       boqRows.push([
         String.fromCharCode(65 + modIdx) + '.' + (i + 1),
         '',
@@ -4207,7 +4220,7 @@ function exportExcel(){
         item.qty,
         item.unit,
         item.cost,
-        amount
+        {t:'n', f:`D${dataRowEnd}*F${dataRowEnd}`}
       ]);
     });
     
@@ -4215,7 +4228,8 @@ function exportExcel(){
     modIdx++;
   });
   
-  boqRows.push(['', '', '', '', '', 'TOTAL ESTIMATE', grandTotalCheck]);
+  const totalRow = dataRowEnd + 1;
+  boqRows.push(['', '', '', '', '', 'TOTAL ESTIMATE', {t:'n', f:`SUM(G${dataRowStart}:G${dataRowEnd})`}]);
   
   const wsBOQ = XLSX.utils.aoa_to_sheet(boqRows);
   
@@ -4243,7 +4257,7 @@ function exportExcel(){
     if(wsBOQ[costCell] && wsBOQ[costCell].t === 'n'){
       wsBOQ[costCell].s = {numFmt:'₱#,##0.00'};
     }
-    if(wsBOQ[amtCell] && wsBOQ[amtCell].t === 'n'){
+    if(wsBOQ[amtCell]){
       wsBOQ[amtCell].s = {numFmt:'₱#,##0.00'};
     }
   }
