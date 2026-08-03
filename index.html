@@ -752,46 +752,164 @@
   .btn.ghost:hover{background:rgba(0,0,0,0.04);color:var(--panel-text);border-color:var(--panel-text-muted);}
   .btn.small{padding:7px 14px;font-size:11px;}
 
-  /* ---- Ledger ---- */
-  .ledger{
+  /* ---- Estimate Section (Master BOQ) ---- */
+  .estimate-section{
     background:var(--surface);
     border:1px solid var(--border);
     border-radius:var(--radius-lg);
     margin-top:16px;
-    padding:22px 24px 26px;
     box-shadow:var(--shadow);
+    overflow:hidden;
   }
-  .ledger h2{
+  .estimate-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 24px;
+    border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .estimate-header-left{display:flex;align-items:baseline;gap:12px;}
+  .estimate-header-left h2{
     font-family:var(--font-display);
     text-transform:uppercase;
     font-size:22px;
-    margin:0 0 2px;
+    margin:0;
     letter-spacing:0.5px;
     color:var(--text);
   }
-  .ledger .sub{
+  .estimate-stats{display:flex;gap:12px;}
+  .estimate-count{
     font-family:var(--font-mono);
     font-size:11px;
     color:var(--text-muted);
+    background:var(--surface-2);
+    padding:3px 10px;
+    border-radius:10px;
+  }
+  .estimate-header-right{text-align:right;}
+  .estimate-total-label{
+    font-family:var(--font-mono);
+    font-size:10px;
     text-transform:uppercase;
     letter-spacing:1px;
-    margin-bottom:16px;
-    display:block;
+    color:var(--text-muted);
+    margin-bottom:2px;
   }
-  .ledger table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:13px;}
-  .ledger th{
+  .estimate-total-value{
+    font-family:var(--font-display);
+    font-size:28px;
+    font-weight:700;
+    color:var(--primary);
+    letter-spacing:0.5px;
+  }
+
+  /* Empty state */
+  .estimate-empty{
+    padding:60px 24px;
+    text-align:center;
+  }
+  .estimate-empty-icon{font-size:48px;margin-bottom:16px;opacity:0.4;}
+  .estimate-empty-title{
+    font-family:var(--font-display);
+    font-size:20px;
+    font-weight:700;
+    text-transform:uppercase;
+    color:var(--text);
+    margin-bottom:8px;
+  }
+  .estimate-empty-desc{
+    font-family:var(--font-sans);
+    font-size:14px;
+    color:var(--text-muted);
+    max-width:400px;
+    margin:0 auto 24px;
+    line-height:1.6;
+  }
+
+  /* Table */
+  .estimate-table-wrap{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .estimate-table{
+    width:100%;
+    border-collapse:collapse;
+    font-family:var(--font-mono);
+    font-size:13px;
+  }
+  .estimate-table thead{
+    position:sticky;
+    top:0;
+    z-index:1;
+  }
+  .estimate-table th{
     text-align:left;
     font-size:10px;
     text-transform:uppercase;
     letter-spacing:0.5px;
     color:var(--text-muted);
-    padding:8px 10px;
-    border-bottom:1px solid var(--border);
+    padding:10px 12px;
+    border-bottom:2px solid var(--border);
     font-weight:600;
+    background:var(--surface);
+    white-space:nowrap;
   }
-  .ledger td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);}
-  .ledger td.num,.ledger th.num{text-align:right;}
-  .ledger input.cost{
+  .estimate-table th.col-qty,
+  .estimate-table th.col-cost,
+  .estimate-table th.col-amount{
+    text-align:right;
+  }
+  .estimate-table th.col-action{
+    width:40px;
+  }
+  .estimate-table td{
+    padding:10px 12px;
+    border-bottom:1px solid var(--border);
+    color:var(--text);
+    vertical-align:middle;
+  }
+  .estimate-table td.num,
+  .estimate-table td.col-qty,
+  .estimate-table td.col-cost,
+  .estimate-table td.col-amount{
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .estimate-table td.col-amount{
+    font-weight:600;
+    color:var(--text);
+  }
+  .estimate-table tr:hover{
+    background:rgba(255,255,255,0.02);
+  }
+  .estimate-table tr.category-row{
+    background:var(--surface-2);
+  }
+  .estimate-table tr.category-row td{
+    padding:8px 12px;
+    font-weight:600;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--text-muted);
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  .estimate-table tr.category-row td::before{
+    content:"";
+    display:inline-block;
+    width:4px;
+    height:12px;
+    background:var(--primary);
+    border-radius:2px;
+    margin-right:8px;
+    vertical-align:middle;
+  }
+
+  /* Unit cost input */
+  .estimate-table input.cost{
     width:90px;
     background:var(--surface-2);
     border:1px solid var(--border);
@@ -800,23 +918,85 @@
     font-family:var(--font-mono);
     font-size:13px;
     text-align:right;
-    padding:5px 8px;
+    padding:6px 10px;
     -moz-appearance:textfield;
     transition:border-color var(--transition),box-shadow var(--transition);
   }
-  .ledger input.cost::-webkit-outer-spin-button,
-  .ledger input.cost::-webkit-inner-spin-button{
+  .estimate-table input.cost::-webkit-outer-spin-button,
+  .estimate-table input.cost::-webkit-inner-spin-button{
     -webkit-appearance:none;
     margin:0;
   }
-  .ledger input.cost:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(59,130,246,0.15);}
-  .ledger tr.grand td{border-top:2px solid var(--border-light);border-bottom:none;padding-top:14px;}
-  .ledger tr.grand .label{font-family:var(--font-display);font-size:18px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text);}
-  .ledger tr.grand .amt{font-family:var(--font-display);font-size:22px;color:var(--primary);font-weight:700;}
-  .ledger .empty{padding:18px 4px;font-size:13px;color:var(--text-dim);font-style:italic;}
-  .ledger-foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:10px;}
-  .rm{background:none;border:none;color:var(--text-dim);cursor:pointer;font-family:var(--font-mono);font-size:15px;line-height:1;padding:2px 6px;border-radius:var(--radius);transition:color var(--transition),background var(--transition);}
-  .rm:hover{color:var(--danger);background:var(--danger-dim);}
+  .estimate-table input.cost:focus{
+    outline:none;
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(59,130,246,0.15);
+  }
+
+  /* Delete button */
+  .estimate-table .rm{
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    cursor:pointer;
+    font-size:16px;
+    line-height:1;
+    padding:4px 8px;
+    border-radius:var(--radius);
+    transition:color var(--transition),background var(--transition);
+  }
+  .estimate-table .rm:hover{
+    color:var(--danger);
+    background:var(--danger-dim);
+  }
+
+  /* Footer */
+  .estimate-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 24px;
+    border-top:1px solid var(--border);
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .estimate-footer-hint{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-dim);
+  }
+  .estimate-footer-actions{
+    display:flex;
+    gap:8px;
+  }
+  .estimate-footer-actions .btn.ghost{
+    border-color:var(--border);
+    color:var(--text-muted);
+  }
+  .estimate-footer-actions .btn.ghost:hover{
+    border-color:var(--text-muted);
+    color:var(--text);
+    background:rgba(255,255,255,0.04);
+  }
+
+  /* Responsive */
+  @media(max-width:768px){
+    .estimate-header{padding:16px;}
+    .estimate-header-left{flex-direction:column;gap:4px;}
+    .estimate-header-right{text-align:left;}
+    .estimate-total-value{font-size:22px;}
+    .estimate-table th.col-category,
+    .estimate-table td.col-category{
+      display:none;
+    }
+    .estimate-footer{padding:12px 16px;}
+  }
+  @media(max-width:480px){
+    .estimate-table th.col-unit,
+    .estimate-table td.col-unit{
+      display:none;
+    }
+  }
 
   .footnote{
     font-family:var(--font-mono);
@@ -1071,34 +1251,53 @@
 
       <div class="panel" id="panel"></div>
 
-      <div class="ledger">
-    <h2>Master Bill of Quantities</h2>
-    <span class="sub">Running estimate — accumulated from every module above</span>
-    <table>
-      <thead>
-        <tr><th>Item</th><th class="num">Qty</th><th>Unit</th><th class="num">Unit Cost (₱)</th><th class="num">Amount (₱)</th><th></th></tr>
-      </thead>
-      <tbody id="ledgerBody"></tbody>
-    </table>
-    <div id="ledgerEmpty" class="empty">No items yet. Compute a module above and press "Add to Estimate".</div>
-    <table>
-      <tbody>
-        <tr class="grand">
-          <td class="label" colspan="4">Total Estimate</td>
-          <td class="amt num" id="grandTotal">₱ 0.00</td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="ledger-foot">
-      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(247,245,239,0.55);">Fill in unit costs to price out each line.</span>
-      <div style="display:flex; gap:8px;">
-        <button class="btn ghost" style="border-color:var(--chalk); color:var(--chalk);" onclick="clearLedger()">Clear</button>
-        <button class="btn ghost" style="border-color:var(--chalk); color:var(--chalk);" onclick="exportPDF()">Export PDF</button>
-        <button class="btn ghost" style="border-color:var(--chalk); color:var(--chalk);" onclick="exportExcel()">Export Excel</button>
+      <div class="estimate-section" id="estimateSection">
+        <div class="estimate-header">
+          <div class="estimate-header-left">
+            <h2>Master BOQ</h2>
+            <div class="estimate-stats">
+              <span class="estimate-count" id="estimateCount">0 items</span>
+            </div>
+          </div>
+          <div class="estimate-header-right">
+            <div class="estimate-total-label">Estimated Total</div>
+            <div class="estimate-total-value" id="grandTotal">₱ 0.00</div>
+          </div>
+        </div>
+        
+        <div class="estimate-empty" id="ledgerEmpty">
+          <div class="estimate-empty-icon">📊</div>
+          <div class="estimate-empty-title">Your estimate is empty</div>
+          <div class="estimate-empty-desc">Calculate quantities from any takeoff module and add the results to your Master BOQ.</div>
+          <button class="btn" onclick="document.querySelector('.nav-item[data-key=excavation]').click()">Start a Calculation</button>
+        </div>
+        
+        <div class="estimate-table-wrap" id="estimateTableWrap">
+          <table class="estimate-table">
+            <thead>
+              <tr>
+                <th class="col-category">Category</th>
+                <th class="col-item">Item</th>
+                <th class="col-qty">Qty</th>
+                <th class="col-unit">Unit</th>
+                <th class="col-cost">Unit Cost</th>
+                <th class="col-amount">Amount</th>
+                <th class="col-action"></th>
+              </tr>
+            </thead>
+            <tbody id="ledgerBody"></tbody>
+          </table>
+        </div>
+        
+        <div class="estimate-footer">
+          <div class="estimate-footer-hint">Edit unit costs to price out each line.</div>
+          <div class="estimate-footer-actions">
+            <button class="btn ghost" onclick="clearLedger()">Clear All</button>
+            <button class="btn ghost" onclick="exportPDF()">Export PDF</button>
+            <button class="btn ghost" onclick="exportExcel()">Export Excel</button>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
   <div class="footnote">
     Default unit-quantity coefficients (cement bags, sand, gravel, CHB per m², coverage rates, wastage %) are typical estimating figures used for quick reference. Actual figures vary by concrete class, mortar mix, material specs, and printing/edition — expand "Adjust reference values" in each module and edit them to match your copy of the book or your project specs before finalizing a bid.
@@ -2270,7 +2469,7 @@ document.getElementById('sidebarOverlay').onclick = closeMobileSidebar;
 function renderPanel(){
   const m = modules[activeTab];
   const panel = document.getElementById('panel');
-  const ledgerEl = document.querySelector('.ledger');
+  const ledgerEl = document.getElementById('estimateSection');
   panel.innerHTML = '';
   
   if(activeTab === 'admin' || activeTab === 'estimate'){
@@ -2909,43 +3108,116 @@ function fmt(n){
 }
 
 /* ---------------- ledger ---------------- */
+const categoryMap = {
+  'Excavation': 'Earthwork',
+  'Concrete': 'Concrete Works',
+  'CHB Masonry': 'Masonry',
+  'Plastering': 'Finishes',
+  'Reinforcement': 'Structural',
+  'Painting': 'Finishes',
+  'Tiling': 'Finishes',
+  'Roofing': 'Roofing',
+  'Doors/Windows': 'Openings',
+  'Electrical': 'MEP',
+  'Form/Scaffold': 'Formwork',
+  'Lumber': 'Carpentry',
+  'Ceiling': 'Finishes',
+  'Steel Works': 'Structural',
+  'Plumbing': 'MEP',
+  'Waterproofing': 'Finishes',
+};
+
+function getCategoryName(itemName) {
+  const prefix = itemName.split(':')[0].trim();
+  return categoryMap[prefix] || 'Other';
+}
+
 function renderLedger(){
   const body = document.getElementById('ledgerBody');
   const emptyMsg = document.getElementById('ledgerEmpty');
+  const tableWrap = document.getElementById('estimateTableWrap');
+  const countEl = document.getElementById('estimateCount');
+  const totalEl = document.getElementById('grandTotal');
+  
   body.innerHTML = '';
-  if(ledger.length===0){
-    emptyMsg.style.display='block';
-  } else {
-    emptyMsg.style.display='none';
-    ledger.forEach(row=>{
+  
+  if(ledger.length === 0){
+    emptyMsg.style.display = 'block';
+    tableWrap.style.display = 'none';
+    countEl.textContent = '0 items';
+    totalEl.textContent = '₱ 0.00';
+    return;
+  }
+  
+  emptyMsg.style.display = 'none';
+  tableWrap.style.display = 'block';
+  countEl.textContent = ledger.length + ' item' + (ledger.length > 1 ? 's' : '');
+  
+  // Group by category
+  const groups = {};
+  ledger.forEach(row => {
+    const cat = getCategoryName(row.item);
+    if(!groups[cat]) groups[cat] = [];
+    groups[cat].push(row);
+  });
+  
+  const categoryOrder = ['Earthwork', 'Concrete Works', 'Structural', 'Masonry', 'Carpentry', 'Formwork', 'Finishes', 'Roofing', 'Openings', 'MEP', 'Other'];
+  const sortedCats = Object.keys(groups).sort((a, b) => {
+    const ai = categoryOrder.indexOf(a);
+    const bi = categoryOrder.indexOf(b);
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  });
+  
+  sortedCats.forEach(cat => {
+    // Category header row
+    const catTr = document.createElement('tr');
+    catTr.className = 'category-row';
+    catTr.innerHTML = `<td colspan="7">${cat}</td>`;
+    body.appendChild(catTr);
+    
+    // Items in this category
+    groups[cat].forEach(row => {
       const tr = document.createElement('tr');
-      const amount = row.qty*row.cost;
+      const amount = row.qty * row.cost;
+      const prefix = row.item.split(':')[0].trim();
+      const itemName = row.item.replace(prefix + ':', '').trim();
+      
       tr.innerHTML = `
-        <td>${row.item}</td>
-        <td class="num">${fmt(row.qty)}</td>
-        <td>${row.unit}</td>
-        <td class="num"><input class="cost" type="number" step="any" value="${row.cost||''}" placeholder="0.00"></td>
-        <td class="num amount-cell">₱ ${fmt(amount)}</td>
-        <td><button class="rm" title="remove">×</button></td>
+        <td class="col-category">${prefix}</td>
+        <td class="col-item">${itemName}</td>
+        <td class="num col-qty">${fmt(row.qty)}</td>
+        <td class="col-unit">${row.unit}</td>
+        <td class="col-cost"><input class="cost" type="number" step="any" value="${row.cost||''}" placeholder="0.00"></td>
+        <td class="num col-amount amount-cell">₱ ${fmt(amount)}</td>
+        <td class="col-action"><button class="rm" title="remove">×</button></td>
       `;
-      tr.querySelector('.cost').addEventListener('input', (e)=>{
-        row.cost = parseFloat(e.target.value)||0;
-        tr.querySelector('.amount-cell').textContent = '₱ ' + fmt(row.qty*row.cost);
-        const grand = ledger.reduce((s,r)=>s+r.qty*r.cost,0);
-        document.getElementById('grandTotal').textContent = '₱ ' + fmt(grand);
+      
+      tr.querySelector('.cost').addEventListener('input', (e) => {
+        row.cost = parseFloat(e.target.value) || 0;
+        tr.querySelector('.amount-cell').textContent = '₱ ' + fmt(row.qty * row.cost);
+        updateEstimateTotal();
       });
-      tr.querySelector('.rm').addEventListener('click', ()=>{
-        ledger = ledger.filter(r=>r.id!==row.id);
+      
+      tr.querySelector('.rm').addEventListener('click', () => {
+        ledger = ledger.filter(r => r.id !== row.id);
         renderLedger();
       });
+      
       body.appendChild(tr);
     });
-  }
-  const grand = ledger.reduce((s,r)=>s+r.qty*r.cost,0);
-  document.getElementById('grandTotal').textContent = '₱ ' + fmt(grand);
+  });
+  
+  updateEstimateTotal();
 }
+
+function updateEstimateTotal(){
+  const grand = ledger.reduce((s, r) => s + r.qty * r.cost, 0);
+  const totalEl = document.getElementById('grandTotal');
+  if(totalEl) totalEl.textContent = '₱ ' + fmt(grand);
+}
+
 function clearLedger(){
-  if(ledger.length===0) return;
+  if(ledger.length === 0) return;
   if(confirm('Clear the entire estimate?')){
     ledger = [];
     renderLedger();
