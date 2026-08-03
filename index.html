@@ -2447,7 +2447,14 @@ auth.onAuthStateChanged(user => {
           showUserInfo(user, isAdmin);
           loadUserData();
         } else {
-          projectOverlay.style.display = 'flex';
+          if(isAdmin){
+            mainApp.style.display = 'block';
+            adminTab.style.display = 'inline-block';
+            showUserInfo(user, isAdmin);
+            projectOverlay.style.display = 'flex';
+          } else {
+            projectOverlay.style.display = 'flex';
+          }
         }
       } else {
         mainApp.style.display = 'none';
