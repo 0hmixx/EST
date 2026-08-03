@@ -445,25 +445,161 @@
     gap:12px;
   }
 
-  /* Coefficients accordion */
-  .coeffs{
-    margin-top:16px;
-    padding-top:14px;
-    border-top:1px dashed var(--panel-border);
+  /* ---- Reference Values Section ---- */
+  .ref-values{
+    margin-top:20px;
+    border:1px solid var(--panel-border);
+    border-radius:var(--radius-lg);
+    background:var(--panel-surface);
+    overflow:hidden;
   }
-  .coeffs summary{
+  .ref-values-toggle{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 16px;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    transition:background var(--transition);
+    text-align:left;
+  }
+  .ref-values-toggle:hover{
+    background:rgba(0,0,0,0.02);
+  }
+  .ref-values-toggle-left{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .ref-values-toggle-title{
+    font-family:var(--font-sans);
+    font-size:13px;
+    font-weight:600;
+    color:var(--panel-text);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .ref-values-toggle-title .icon{
+    font-size:14px;
+    opacity:0.5;
+  }
+  .ref-values-toggle-desc{
+    font-family:var(--font-sans);
+    font-size:11px;
+    color:var(--panel-text-muted);
+  }
+  .ref-values-toggle-arrow{
+    font-size:12px;
+    color:var(--panel-text-muted);
+    transition:transform 0.2s ease;
+    flex-shrink:0;
+  }
+  .ref-values[open] .ref-values-toggle-arrow{
+    transform:rotate(180deg);
+  }
+  .ref-values-body{
+    padding:0 16px 16px;
+    border-top:1px solid var(--panel-border);
+  }
+  .ref-values-group{
+    margin-top:14px;
+  }
+  .ref-values-group-title{
+    font-family:var(--font-mono);
+    font-size:10px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--panel-text-muted);
+    margin-bottom:10px;
+    padding-bottom:6px;
+    border-bottom:1px solid var(--panel-border);
+  }
+  .ref-field{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:8px 0;
+  }
+  .ref-field + .ref-field{
+    border-top:1px solid rgba(0,0,0,0.04);
+  }
+  .ref-field-label{
+    flex:1;
+    min-width:0;
+  }
+  .ref-field-name{
+    font-family:var(--font-sans);
+    font-size:13px;
+    font-weight:500;
+    color:var(--panel-text);
+    line-height:1.3;
+  }
+  .ref-field-desc{
+    font-family:var(--font-sans);
+    font-size:11px;
+    color:var(--panel-text-muted);
+    margin-top:1px;
+  }
+  .ref-field-input{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+  }
+  .ref-field-input input{
+    width:80px;
+    font-family:var(--font-mono);
+    font-size:13px;
+    font-weight:500;
+    padding:7px 10px;
+    border:1px solid var(--panel-input-border);
+    border-radius:var(--radius);
+    background:var(--panel-input-bg);
+    color:var(--panel-text);
+    text-align:right;
+    transition:border-color var(--transition),box-shadow var(--transition);
+  }
+  .ref-field-input input:focus{
+    outline:none;
+    border-color:var(--panel-input-focus);
+    box-shadow:0 0 0 3px rgba(59,130,246,0.15);
+  }
+  .ref-field-unit{
     font-family:var(--font-mono);
     font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-    cursor:pointer;
     color:var(--panel-text-muted);
-    font-weight:500;
-    transition:color var(--transition);
-    user-select:none;
+    min-width:50px;
+    text-align:left;
   }
-  .coeffs summary:hover{color:var(--panel-text);}
-  .coeffs .field{margin-top:10px;}
+  .ref-values-footer{
+    margin-top:16px;
+    padding-top:12px;
+    border-top:1px solid var(--panel-border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .ref-save-hint{
+    font-family:var(--font-sans);
+    font-size:11px;
+    color:var(--panel-text-muted);
+    font-style:italic;
+  }
+  .ref-save-hint.saved{
+    color:var(--success);
+    font-style:normal;
+    font-weight:500;
+  }
+
+  @media(max-width:600px){
+    .ref-field{flex-direction:column;align-items:stretch;gap:6px;}
+    .ref-field-input{justify-content:flex-start;}
+    .ref-field-input input{text-align:left;}
+  }
 
   /* ---- Output / Results ---- */
   .calc-output{
@@ -2618,18 +2754,57 @@ function renderPanel(){
     applyFieldGroups();
   }
 
-  if(m.coeffs.length>0){
-    const coeffWrap = document.createElement('details');
-    coeffWrap.className='coeffs';
-    coeffWrap.innerHTML = `<summary>Adjust reference values</summary>`;
-    m.coeffs.forEach(c=>{
-      const wrap = document.createElement('div');
-      wrap.className='field';
-      wrap.innerHTML = `<label>${c.label} <span class="hint">(${c.unit})</span></label>
-        <input id="c_${c.id}" type="${typeof c.def==='number'?'number':'text'}" ${typeof c.def==='number'?'step="any"':''} value="${c.def}">`;
-      coeffWrap.appendChild(wrap);
+  if(m.coeffs.length > 0){
+    const refWrap = document.createElement('details');
+    refWrap.className = 'ref-values';
+    
+    // Group coefficients by category
+    const groups = {};
+    m.coeffs.forEach(c => {
+      const group = c.group || 'Reference Values';
+      if(!groups[group]) groups[group] = [];
+      groups[group].push(c);
     });
-    left.appendChild(coeffWrap);
+    
+    const groupNames = Object.keys(groups);
+    const totalFields = m.coeffs.length;
+    
+    refWrap.innerHTML = `
+      <button type="button" class="ref-values-toggle" onclick="this.parentElement.toggleAttribute('open')">
+        <div class="ref-values-toggle-left">
+          <div class="ref-values-toggle-title">
+            <span class="icon">⚙</span>
+            Reference Values
+          </div>
+          <div class="ref-values-toggle-desc">${totalFields} coefficient${totalFields > 1 ? 's' : ''} — material rates & estimating assumptions</div>
+        </div>
+        <span class="ref-values-toggle-arrow">▼</span>
+      </button>
+      <div class="ref-values-body">
+        ${groupNames.map(groupName => `
+          <div class="ref-values-group">
+            <div class="ref-values-group-title">${groupName}</div>
+            ${groups[groupName].map(c => `
+              <div class="ref-field">
+                <div class="ref-field-label">
+                  <div class="ref-field-name">${c.label}</div>
+                  ${c.hint ? `<div class="ref-field-desc">${c.hint}</div>` : ''}
+                </div>
+                <div class="ref-field-input">
+                  <input id="c_${c.id}" type="${typeof c.def==='number'?'number':'text'}" ${typeof c.def==='number'?'step="any"':''} value="${c.def}">
+                  <span class="ref-field-unit">${c.unit}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `).join('')}
+        <div class="ref-values-footer">
+          <span class="ref-save-hint" id="refSaveHint">Values update automatically</span>
+        </div>
+      </div>
+    `;
+    
+    left.appendChild(refWrap);
   }
 
   if(m.memberLabels){
