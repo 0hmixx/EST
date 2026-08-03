@@ -88,39 +88,60 @@
   /* ---- Tabs ---- */
   .tabs{
     display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin-bottom:0;
+    flex-direction:column;
+    gap:2px;
     position:relative;
     z-index:2;
   }
   .tab{
     font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
+    font-size:11px;
     letter-spacing:0.5px;
     text-transform:uppercase;
-    background:var(--cyan);
-    color:var(--chalk);
+    background:transparent;
+    color:var(--yellow);
     border:none;
-    padding:10px 16px 12px;
+    border-left:3px solid transparent;
+    padding:10px 14px;
     cursor:pointer;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 70%);
-    opacity:0.65;
-    transition: opacity 0.15s, transform 0.15s;
+    text-align:left;
+    transition: all 0.15s;
   }
-  .tab:hover{opacity:0.9;}
+  .tab:hover{color:var(--chalk);background:rgba(255,255,255,0.05);}
   .tab.active{
-    background:var(--vellum);
-    color:var(--graphite);
-    opacity:1;
+    color:var(--chalk);
+    border-left-color:var(--chalk);
+    background:rgba(255,255,255,0.08);
     font-weight:600;
-    transform:translateY(-2px);
+  }
+
+  .app-layout{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    gap:0;
+    min-height:calc(100vh - 140px);
+  }
+  .sidebar{
+    background:rgba(0,0,0,0.3);
+    border-right:1px solid rgba(255,255,255,0.1);
+    padding:16px 0;
+  }
+  .sidebar-title{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--yellow);
+    padding:0 14px 10px;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+    margin-bottom:8px;
   }
 
   .panel{
     background:var(--vellum);
     color:var(--graphite);
     border:1px solid var(--vellum-line);
+    border-top:none;
     padding:24px;
     display:grid;
     grid-template-columns: 300px 1fr;
@@ -405,10 +426,15 @@
     </div>
   </div>
 
-  <div class="tabs" id="tabs"></div>
-  <div class="panel" id="panel"></div>
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="sidebar-title">Calculators</div>
+      <div class="tabs" id="tabs"></div>
+    </div>
+    <div>
+      <div class="panel" id="panel"></div>
 
-  <div class="ledger">
+      <div class="ledger">
     <h2>Master Bill of Quantities</h2>
     <span class="sub">Running estimate — accumulated from every module above</span>
     <table>
@@ -441,7 +467,8 @@
     Default unit-quantity coefficients (cement bags, sand, gravel, CHB per m², coverage rates, wastage %) are typical estimating figures used for quick reference. Actual figures vary by concrete class, mortar mix, material specs, and printing/edition — expand "Adjust reference values" in each module and edit them to match your copy of the book or your project specs before finalizing a bid.
   </div>
 
-</div>
+  </div>
+  </div>
 
 <script>
 /* ---------------- state ---------------- */
@@ -2435,6 +2462,12 @@ auth.onAuthStateChanged(user => {
   if(user){
     currentUser = user;
     loginOverlay.style.display = 'none';
+    db.collection('users').doc(user.uid).set({
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+      lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
     db.collection('users').doc(user.uid).get().then(doc => {
       const isAdmin = user.email === ADMIN_EMAIL;
       const isActive = doc.exists && doc.data().active === true;
@@ -2461,9 +2494,6 @@ auth.onAuthStateChanged(user => {
         accessOverlay.style.display = 'flex';
       }
     });
-    db.collection('users').doc(user.uid).set({
-      lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
   } else {
     currentUser = null;
     loginOverlay.style.display = 'flex';
