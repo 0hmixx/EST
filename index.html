@@ -2025,6 +2025,11 @@ const modules = {
         {v:'B', t:'Class B (1:2.5:5)'},
         {v:'C', t:'Class C (1:3:6)'},
       ], def:'A'},
+      {id:'slabCount', label:'Number of slabs', unit:'pcs', def:1},
+      {id:'beamCount', label:'Number of beams', unit:'pcs', def:1},
+      {id:'colCount', label:'Number of columns', unit:'pcs', def:1},
+      {id:'ftgCount', label:'Number of footings', unit:'pcs', def:1},
+      {id:'wallCount', label:'Number of walls', unit:'pcs', def:1},
       {id:'colMainDia', label:'Main bar diameter', type:'select', options:[
         {v:'12',t:'12 mm'},{v:'16',t:'16 mm'},{v:'20',t:'20 mm'},{v:'25',t:'25 mm'},{v:'28',t:'28 mm'},
       ], def:'20'},
@@ -2036,11 +2041,11 @@ const modules = {
     ],
     fieldGroupSelect:'member',
     fieldGroups:{
-      slab:['member','len','wid','thk','mix'],
-      beam:['member','len','wid','thk','mix'],
-      column:['member','len','wid','thk','mix','colMainDia','colMainCount','colTieDia','colTieSpacing'],
-      footing:['member','len','wid','thk','mix'],
-      wall:['member','len','wid','thk','mix'],
+      slab:['member','slabCount','len','wid','thk','mix'],
+      beam:['member','beamCount','len','wid','thk','mix'],
+      column:['member','colCount','len','wid','thk','mix','colMainDia','colMainCount','colTieDia','colTieSpacing'],
+      footing:['member','ftgCount','len','wid','thk','mix'],
+      wall:['member','wallCount','len','wid','thk','mix'],
     },
     memberLabels:{
       slab:   {len:'Slab length',     wid:'Slab width',      thk:'Slab thickness', name:'Slab'},
@@ -2063,12 +2068,17 @@ const modules = {
       const key = {AA:'cAA',A:'cA',B:'cB',C:'cC'}[v.mix];
       const parts = c[key].split(',').map(Number);
       const waste = 1 + c.wastePct/100;
-      const cement = vol*parts[0]*waste;
-      const sand = vol*parts[1]*waste;
-      const gravel = vol*parts[2]*waste;
       const name = this.memberLabels[v.member].name;
+      // Get count for this member type
+      const countKey = {slab:'slabCount',beam:'beamCount',column:'colCount',footing:'ftgCount',wall:'wallCount'}[v.member];
+      const count = (v[countKey] > 0) ? v[countKey] : 1;
+      const totalVol = vol * count;
+      const cement = totalVol*parts[0]*waste;
+      const sand = totalVol*parts[1]*waste;
+      const gravel = totalVol*parts[2]*waste;
       const results = [
-        {item:`${name} volume`, qty:vol, unit:'cu.m.', hidden:true},
+        {item:`${name} volume (each)`, qty:vol, unit:'cu.m.', hidden:true},
+        {item:`${name} volume (total)`, qty:totalVol, unit:'cu.m.', hidden:true},
         {item:'Cement', qty:cement, unit:'bags (40kg)'},
         {item:'Sand', qty:sand, unit:'cu.m.'},
         {item:'Gravel', qty:gravel, unit:'cu.m.'},
@@ -2081,12 +2091,17 @@ const modules = {
         const kgPerM_main = (v.colMainDia*v.colMainDia)/162;
         const kgPerM_tie = (v.colTieDia*v.colTieDia)/162;
         const mainBarLen = colH * rw;
-        const mainWeight = mainBarLen * v.colMainCount * kgPerM_main;
+        const mainWeightPerCol = mainBarLen * v.colMainCount * kgPerM_main;
         const tiePerimeter = 2*((b - 2*c.colConcCover) + (d - 2*c.colConcCover))/1000 + 24*v.colTieDia/1000;
         const colTieSpacing = v.colTieSpacing > 0 ? v.colTieSpacing : 100;
-        const tieCount = Math.ceil(colH*1000/colTieSpacing) + 1;
-        const tieWeight = tieCount * tiePerimeter * kgPerM_tie;
-        const totalRebarWeight = mainWeight + tieWeight;
+        const tieCountPerCol = Math.ceil(colH*1000/colTieSpacing) + 1;
+        const tieWeightPerCol = tieCountPerCol * tiePerimeter * kgPerM_tie;
+        const totalRebarWeightPerCol = mainWeightPerCol + tieWeightPerCol;
+        // Multiply rebar by column count
+        const mainWeight = mainWeightPerCol * count;
+        const tieCount = tieCountPerCol * count;
+        const tieWeight = tieWeightPerCol * count;
+        const totalRebarWeight = totalRebarWeightPerCol * count;
         results.push(
           {item:'Main bars weight', qty:mainWeight, unit:'kg', hidden:true},
           {item:'Ties count', qty:tieCount, unit:'pcs'},
@@ -2251,6 +2266,9 @@ const modules = {
       {id:'tieSpacing', label:'Tie spacing (lower)', unit:'mm', def:0},
       {id:'tieSpacingUpper', label:'Tie spacing (upper)', unit:'mm', def:0},
       {id:'colCount', label:'Number of columns', unit:'pcs', def:1},
+      {id:'beamCount', label:'Number of beams', unit:'pcs', def:1},
+      {id:'slabCount', label:'Number of slabs', unit:'pcs', def:1},
+      {id:'footingCount', label:'Number of footings', unit:'pcs', def:1},
       {id:'slabLen', label:'Slab length', unit:'m', def:0},
       {id:'slabWid', label:'Slab width', unit:'m', def:0},
       {id:'thk', label:'Thickness', unit:'mm', def:0},
@@ -2273,10 +2291,10 @@ const modules = {
     fieldGroupSelect:'type',
     fieldGroups:{
       bar:['type','dia','totalLen','stockLen'],
-      beam:['type','span','b','h','topDia','topCount','botDia','botCount','stirrupDia','stirrupSpacing'],
+      beam:['type','beamCount','span','b','h','topDia','topCount','botDia','botCount','stirrupDia','stirrupSpacing'],
       column:['type','colCount','colH','b','d','mainDia','mainCount','tieDia','tieSpacing','tieSpacingUpper'],
-      slab:['type','slabLen','slabWid','thk','mainDia','mainSpacing','tempDia','tempSpacing'],
-      footing:['type','fLen','fWid','dir1Dia','dir1Spacing','dir2Dia','dir2Spacing'],
+      slab:['type','slabCount','slabLen','slabWid','thk','mainDia','mainSpacing','tempDia','tempSpacing'],
+      footing:['type','footingCount','fLen','fWid','dir1Dia','dir1Spacing','dir2Dia','dir2Spacing'],
     },
     coeffs:[
       {id:'concreteCover', label:'Concrete cover', unit:'mm', def:40},
@@ -2299,25 +2317,32 @@ const modules = {
         ];
       }
       if(v.type==='beam'){
+        const beamCount = v.beamCount > 0 ? v.beamCount : 1;
         const barLen = v.span * waste;
         const kgPerM_bot = (v.botDia*v.botDia)/162;
         const kgPerM_top = (v.topDia*v.topDia)/162;
         const kgPerM_stir = (v.stirrupDia*v.stirrupDia)/162;
-        const botWeight = barLen * v.botCount * kgPerM_bot;
-        const topWeight = barLen * v.topCount * kgPerM_top;
+        const botWeightPerBeam = barLen * v.botCount * kgPerM_bot;
+        const topWeightPerBeam = barLen * v.topCount * kgPerM_top;
         const stirrupSpacing = v.stirrupSpacing > 0 ? v.stirrupSpacing : 100;
-        const stirrupCount = Math.ceil(v.span*1000/stirrupSpacing) + 1;
+        const stirrupsPerBeam = Math.ceil(v.span*1000/stirrupSpacing) + 1;
         const stirrupPerimeter = 2*((v.b - 2*c.concreteCover) + (v.h - 2*c.concreteCover))/1000 + 24*v.stirrupDia/1000;
-        const stirrupWeight = stirrupCount * stirrupPerimeter * kgPerM_stir;
-        const totalWeight = botWeight + topWeight + stirrupWeight;
-        const botBarCount = Math.ceil((v.span*waste) / stockLen) * v.botCount;
-        const topBarCount = Math.ceil((v.span*waste) / stockLen) * v.topCount;
+        const stirrupWeightPerBeam = stirrupsPerBeam * stirrupPerimeter * kgPerM_stir;
+        const totalWeightPerBeam = botWeightPerBeam + topWeightPerBeam + stirrupWeightPerBeam;
+        const botBarCountPerBeam = Math.ceil((v.span*waste) / stockLen) * v.botCount;
+        const topBarCountPerBeam = Math.ceil((v.span*waste) / stockLen) * v.topCount;
+        // Multiply all by beam count
+        const botBarCount = botBarCountPerBeam * beamCount;
+        const topBarCount = topBarCountPerBeam * beamCount;
+        const stirrupCount = stirrupsPerBeam * beamCount;
+        const totalWeight = totalWeightPerBeam * beamCount;
+        const tieWire = totalWeight * c.tieWirePerKg;
         return [
           {item:`Bottom bars (${v.botDia}mm × ${stockLen}m ea.)`, qty:botBarCount, unit:'pcs'},
           {item:`Top bars (${v.topDia}mm × ${stockLen}m ea.)`, qty:topBarCount, unit:'pcs'},
           {item:'Stirrups', qty:stirrupCount, unit:'pcs'},
           {item:'Total beam rebar weight', qty:totalWeight, unit:'kg'},
-          {item:'Tie wire', qty:totalWeight*c.tieWirePerKg, unit:'kg'},
+          {item:'Tie wire', qty:tieWire, unit:'kg'},
         ];
       }
       if(v.type==='column'){
@@ -2354,49 +2379,63 @@ const modules = {
         ];
       }
       if(v.type==='slab'){
+        const slabCount = v.slabCount > 0 ? v.slabCount : 1;
         const kgPerM_main = (v.mainDia*v.mainDia)/162;
         const kgPerM_temp = (v.tempDia*v.tempDia)/162;
         const mainSpacing = v.mainSpacing > 0 ? v.mainSpacing : 100;
         const tempSpacing = v.tempSpacing > 0 ? v.tempSpacing : 100;
         const mainBars = Math.ceil(v.slabWid*1000/mainSpacing) + 1;
-        const mainTotalLen = mainBars * v.slabLen * waste;
-        const mainPcs = Math.ceil(mainTotalLen / stockLen);
-        const mainWeight = mainTotalLen * kgPerM_main;
+        const mainTotalLenPerSlab = mainBars * v.slabLen * waste;
+        const mainPcsPerSlab = Math.ceil(mainTotalLenPerSlab / stockLen);
+        const mainWeightPerSlab = mainTotalLenPerSlab * kgPerM_main;
         const tempBars = Math.ceil(v.slabLen*1000/tempSpacing) + 1;
-        const tempTotalLen = tempBars * v.slabWid * waste;
-        const tempPcs = Math.ceil(tempTotalLen / stockLen);
-        const tempWeight = tempTotalLen * kgPerM_temp;
-        const totalWeight = mainWeight + tempWeight;
+        const tempTotalLenPerSlab = tempBars * v.slabWid * waste;
+        const tempPcsPerSlab = Math.ceil(tempTotalLenPerSlab / stockLen);
+        const tempWeightPerSlab = tempTotalLenPerSlab * kgPerM_temp;
+        // Multiply all by slab count
+        const mainPcs = mainPcsPerSlab * slabCount;
+        const mainTotalLen = mainTotalLenPerSlab * slabCount;
+        const tempPcs = tempPcsPerSlab * slabCount;
+        const tempTotalLen = tempTotalLenPerSlab * slabCount;
+        const totalWeight = (mainWeightPerSlab + tempWeightPerSlab) * slabCount;
+        const tieWire = totalWeight * c.tieWirePerKg;
         return [
           {item:`Main bars (${v.mainDia}mm × ${stockLen}m ea.)`, qty:mainPcs, unit:'pcs'},
           {item:'Main bars total length', qty:mainTotalLen, unit:'running m', hidden:true},
           {item:`Temp bars (${v.tempDia}mm × ${stockLen}m ea.)`, qty:tempPcs, unit:'pcs'},
           {item:'Temp bars total length', qty:tempTotalLen, unit:'running m', hidden:true},
           {item:'Total slab rebar weight', qty:totalWeight, unit:'kg'},
-          {item:'Tie wire', qty:totalWeight*c.tieWirePerKg, unit:'kg'},
+          {item:'Tie wire', qty:tieWire, unit:'kg'},
         ];
       }
       if(v.type==='footing'){
+        const footingCount = v.footingCount > 0 ? v.footingCount : 1;
         const kgPerM_d1 = (v.dir1Dia*v.dir1Dia)/162;
         const kgPerM_d2 = (v.dir2Dia*v.dir2Dia)/162;
         const dir1Spacing = v.dir1Spacing > 0 ? v.dir1Spacing : 100;
         const dir2Spacing = v.dir2Spacing > 0 ? v.dir2Spacing : 100;
         const d1Bars = Math.ceil(v.fWid*1000/dir1Spacing) + 1;
-        const d1TotalLen = d1Bars * v.fLen * waste;
-        const d1Pcs = Math.ceil(d1TotalLen / stockLen);
-        const d1Weight = d1TotalLen * kgPerM_d1;
+        const d1TotalLenPerFtg = d1Bars * v.fLen * waste;
+        const d1PcsPerFtg = Math.ceil(d1TotalLenPerFtg / stockLen);
+        const d1WeightPerFtg = d1TotalLenPerFtg * kgPerM_d1;
         const d2Bars = Math.ceil(v.fLen*1000/dir2Spacing) + 1;
-        const d2TotalLen = d2Bars * v.fWid * waste;
-        const d2Pcs = Math.ceil(d2TotalLen / stockLen);
-        const d2Weight = d2TotalLen * kgPerM_d2;
-        const totalWeight = d1Weight + d2Weight;
+        const d2TotalLenPerFtg = d2Bars * v.fWid * waste;
+        const d2PcsPerFtg = Math.ceil(d2TotalLenPerFtg / stockLen);
+        const d2WeightPerFtg = d2TotalLenPerFtg * kgPerM_d2;
+        // Multiply all by footing count
+        const d1Pcs = d1PcsPerFtg * footingCount;
+        const d1TotalLen = d1TotalLenPerFtg * footingCount;
+        const d2Pcs = d2PcsPerFtg * footingCount;
+        const d2TotalLen = d2TotalLenPerFtg * footingCount;
+        const totalWeight = (d1WeightPerFtg + d2WeightPerFtg) * footingCount;
+        const tieWire = totalWeight * c.tieWirePerKg;
         return [
           {item:`Dir. 1 bars (${v.dir1Dia}mm × ${stockLen}m ea.)`, qty:d1Pcs, unit:'pcs'},
           {item:'Dir. 1 bars total length', qty:d1TotalLen, unit:'running m', hidden:true},
           {item:`Dir. 2 bars (${v.dir2Dia}mm × ${stockLen}m ea.)`, qty:d2Pcs, unit:'pcs'},
           {item:'Dir. 2 bars total length', qty:d2TotalLen, unit:'running m', hidden:true},
           {item:'Total footing rebar weight', qty:totalWeight, unit:'kg'},
-          {item:'Tie wire', qty:totalWeight*c.tieWirePerKg, unit:'kg'},
+          {item:'Tie wire', qty:tieWire, unit:'kg'},
         ];
       }
     }
