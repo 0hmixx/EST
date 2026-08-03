@@ -355,7 +355,6 @@
     }
     .sidebar.open{transform:translateX(0);}
     .app-layout{grid-template-columns:1fr;min-height:calc(100vh - 100px);}
-    .titleblock{margin-left:48px;}
   }
 
   /* ---- Calculator Panel ---- */
@@ -1147,23 +1146,6 @@
   .spinner::after{content:'';width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ---- Toast ---- */
-  .toast{
-    position:fixed;bottom:20px;right:20px;
-    background:var(--surface);border:1px solid var(--border);
-    color:var(--text);
-    padding:12px 20px;border-radius:var(--radius);
-    font-family:var(--font-sans);font-size:13px;
-    z-index:10001;
-    opacity:0;transform:translateY(12px);
-    transition:all .25s ease;
-    pointer-events:none;
-    box-shadow:var(--shadow);
-  }
-  .toast.show{opacity:1;transform:translateY(0);}
-  .toast.success{border-color:var(--success);color:var(--success);background:var(--success-dim);}
-  .toast.error{border-color:var(--danger);color:var(--danger);background:var(--danger-dim);}
-
   /* ---- Save indicator ---- */
   .save-indicator{position:fixed;bottom:20px;left:20px;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);opacity:0;transition:opacity .3s;z-index:100;}
   .save-indicator.show{opacity:1;}
@@ -1184,23 +1166,6 @@
   .timeout-box button:hover{background:var(--primary-hover);}
   .timeout-box button.secondary{background:var(--surface-3);color:var(--text-muted);}
   .timeout-box button.secondary:hover{background:var(--border);color:var(--text);}
-
-  /* ---- User info ---- */
-  .user-info{display:flex;align-items:center;gap:10px;}
-  .user-info img{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);}
-  .user-info span{font-family:var(--font-sans);font-size:13px;color:var(--text-muted);}
-  .logout-btn{
-    background:transparent;
-    border:1px solid var(--border);
-    color:var(--text-muted);
-    padding:5px 12px;
-    border-radius:var(--radius);
-    font-family:var(--font-mono);
-    font-size:11px;
-    cursor:pointer;
-    transition:all var(--transition);
-  }
-  .logout-btn:hover{border-color:var(--text-muted);color:var(--text);background:rgba(255,255,255,0.04);}
 
   /* ---- Price Database ---- */
   .price-db{
@@ -1533,7 +1498,6 @@
     .header-right{flex-direction:column;align-items:stretch;gap:10px;}
     .header-actions{justify-content:flex-start;}
     .header-secondary{display:none;}
-    .titleblock{margin-left:0;}
     
     /* Panel */
     .panel{padding:16px;gap:16px;}
@@ -1570,9 +1534,6 @@
     .login-card{padding:32px 24px;}
     .login-title{font-size:24px;}
     .access-box,.project-box{padding:32px 24px;}
-    
-    /* Ledger */
-    .ledger{padding:16px;}
   }
   
   /* Small phones */
@@ -1612,6 +1573,7 @@
     .estimate-section{border:none;box-shadow:none;}
     body{background:#fff;color:#000;padding:0;}
   }
+</style>
 </head>
 <body>
 <div class="spinner" id="spinner"></div>
@@ -1838,7 +1800,6 @@ function matchPriceToItem(itemName){
     'gravel': 'gravel',
     'chb': 'chb4',
     'rebar': 'rebar12',
-    'tie wire': 'tieWire',
     'tie wire': 'tieWire',
     'plywood': 'plywood',
     'adhesive': 'adhesive',
@@ -3836,7 +3797,7 @@ function clearLedger(){
 
 /* ---------------- export PDF ---------------- */
 function exportPDF(){
-  if(ledger.length===0){alert('No items in estimate.'); return;}
+  if(ledger.length===0){showToast('No items in estimate.','warning'); return;}
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF();
   
@@ -4129,7 +4090,7 @@ function fmtPeso(n){
 
 /* ---------------- export Excel ---------------- */
 function exportExcel(){
-  if(ledger.length===0){alert('No items in estimate.'); return;}
+  if(ledger.length===0){showToast('No items in estimate.','warning'); return;}
   
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
@@ -4597,8 +4558,7 @@ function loadUserData(){
       if(data.ledgerIdSeq) ledgerIdSeq = data.ledgerIdSeq;
       if(data.projectInfo){
         projectInfo = data.projectInfo;
-        document.getElementById('projectTitle').textContent = projectInfo.title || 'Estimate Calculator';
-        document.getElementById('projectSubtitle').textContent = [projectInfo.owner, projectInfo.location, projectInfo.date].filter(Boolean).join(' — ') || 'Ref. Max B. Fajardo — Simplified Construction Estimate';
+        updateHeader();
       }
       renderPanel();
       renderLedger();
