@@ -64,51 +64,116 @@
   }
   .wrap{max-width:1200px;margin:0 auto;}
 
-  /* ---- Title block ---- */
-  .titleblock{
+  /* ---- Header ---- */
+  .app-header{
     background:var(--surface);
     border:1px solid var(--border);
     border-radius:var(--radius-lg);
-    display:grid;
-    grid-template-columns:1fr auto;
     padding:20px 24px;
     margin-bottom:16px;
     position:relative;
     box-shadow:var(--shadow);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
   }
-  .titleblock::before{
+  .app-header::before{
     content:"";
     position:absolute;inset:0;
     border-radius:var(--radius-lg);
     border:1px solid rgba(255,255,255,0.04);
     pointer-events:none;
   }
-  .titleblock h1{
+  .header-left{flex:1;min-width:0;}
+  .project-name{
     font-family:var(--font-display);
     font-weight:800;
-    font-size:clamp(26px,4vw,38px);
+    font-size:clamp(22px,3.5vw,32px);
     letter-spacing:0.5px;
     margin:0 0 4px 0;
     text-transform:uppercase;
-    line-height:1;
+    line-height:1.1;
     color:var(--text);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
-  .titleblock .sub{
+  .project-meta{
+    font-family:var(--font-sans);
+    font-size:13px;
+    color:var(--text-muted);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .project-meta .sep{color:var(--text-dim);font-size:11px;}
+  .current-module{
     font-family:var(--font-mono);
     font-size:11px;
-    color:var(--text-muted);
-    letter-spacing:1px;
+    font-weight:500;
+    letter-spacing:0.5px;
     text-transform:uppercase;
+    color:var(--primary);
+    margin-top:8px;
+    display:flex;
+    align-items:center;
+    gap:6px;
   }
-  .titleblock .meta{
+  .current-module::before{
+    content:"";
+    width:6px;height:6px;
+    background:var(--primary);
+    border-radius:50%;
+    opacity:0.6;
+  }
+  .header-right{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-shrink:0;
+  }
+  .header-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .header-secondary{
+    font-family:var(--font-mono);
+    font-size:9px;
+    color:var(--text-dim);
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    display:flex;
+    gap:12px;
+    margin-top:12px;
+  }
+  .header-secondary span{opacity:0.7;}
+  .user-info{display:flex;align-items:center;gap:10px;}
+  .user-info img{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);}
+  .user-info span{font-family:var(--font-sans);font-size:13px;color:var(--text-muted);}
+  .logout-btn{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    padding:5px 12px;
+    border-radius:var(--radius);
     font-family:var(--font-mono);
     font-size:11px;
-    text-align:right;
-    color:var(--text-muted);
-    line-height:1.8;
-    align-self:end;
+    cursor:pointer;
+    transition:all var(--transition);
   }
-  .titleblock .meta b{color:var(--primary);font-weight:600;}
+  .logout-btn:hover{border-color:var(--text-muted);color:var(--text);background:rgba(255,255,255,0.04);}
+
+  @media(max-width:768px){
+    .app-header{flex-direction:column;padding:16px;}
+    .header-right{width:100%;justify-content:space-between;}
+    .header-actions{flex-wrap:wrap;}
+    .project-name{font-size:20px;}
+    .project-meta{font-size:12px;}
+    .header-secondary{display:none;}
+  }
 
   /* ---- Sidebar ---- */
   .app-layout{
@@ -293,7 +358,7 @@
     .titleblock{margin-left:48px;}
   }
 
-  /* ---- Panel ---- */
+  /* ---- Calculator Panel ---- */
   .panel{
     background:var(--panel-bg);
     color:var(--panel-text);
@@ -301,10 +366,11 @@
     border-top:none;
     padding:28px;
     display:grid;
-    grid-template-columns:300px 1fr;
+    grid-template-columns:340px 1fr;
     gap:28px;
+    min-height:400px;
   }
-  @media(max-width:720px){.panel{grid-template-columns:1fr;}}
+  @media(max-width:900px){.panel{grid-template-columns:1fr;}}
 
   .panel h2{
     font-family:var(--font-display);
@@ -322,9 +388,12 @@
   }
 
   /* ---- Form fields ---- */
+  .calc-inputs{display:flex;flex-direction:column;gap:0;}
   .field{margin-bottom:14px;}
   .field label{
-    display:block;
+    display:flex;
+    align-items:center;
+    gap:6px;
     font-family:var(--font-mono);
     font-size:11px;
     text-transform:uppercase;
@@ -333,7 +402,24 @@
     color:var(--panel-text-muted);
     font-weight:500;
   }
-  .field .hint{font-weight:400;text-transform:none;color:var(--panel-text-muted);letter-spacing:0;opacity:0.7;}
+  .field .hint{
+    font-weight:400;
+    text-transform:none;
+    letter-spacing:0;
+    opacity:0.7;
+    font-size:10px;
+    color:var(--panel-text-muted);
+  }
+  .field .unit-badge{
+    font-family:var(--font-mono);
+    font-size:10px;
+    font-weight:500;
+    color:var(--primary);
+    background:rgba(59,130,246,0.08);
+    padding:1px 6px;
+    border-radius:3px;
+    margin-left:auto;
+  }
   .field input,.field select{
     width:100%;
     font-family:var(--font-mono);
@@ -350,8 +436,16 @@
     border-color:var(--panel-input-focus);
     box-shadow:0 0 0 3px rgba(59,130,246,0.15);
   }
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .field input[type="number"]{
+    font-variant-numeric:tabular-nums;
+  }
+  .field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
 
+  /* Coefficients accordion */
   .coeffs{
     margin-top:16px;
     padding-top:14px;
@@ -366,19 +460,49 @@
     color:var(--panel-text-muted);
     font-weight:500;
     transition:color var(--transition);
+    user-select:none;
   }
   .coeffs summary:hover{color:var(--panel-text);}
   .coeffs .field{margin-top:10px;}
 
-  /* ---- Output table ---- */
-  .output table{
+  /* ---- Output / Results ---- */
+  .calc-output{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+  }
+  .output-section{
+    background:var(--panel-surface);
+    border:1px solid var(--panel-border);
+    border-radius:var(--radius-lg);
+    padding:20px;
+    flex:1;
+  }
+  .output-header{
+    font-family:var(--font-display);
+    font-size:14px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--panel-text);
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .output-header::before{
+    content:"";
+    width:4px;height:16px;
+    background:var(--primary);
+    border-radius:2px;
+  }
+  .output-table{
     width:100%;
     border-collapse:collapse;
     font-family:var(--font-mono);
     font-size:13px;
-    margin-bottom:14px;
   }
-  .output th{
+  .output-table th{
     text-align:left;
     font-size:10px;
     text-transform:uppercase;
@@ -388,12 +512,84 @@
     padding:8px 10px;
     font-weight:600;
   }
-  .output td{
-    padding:9px 10px;
+  .output-table td{
+    padding:10px;
     border-bottom:1px solid var(--panel-border);
   }
-  .output td.qty{text-align:right;font-weight:600;color:var(--panel-text);}
-  .output tr.total td{border-top:2px solid var(--panel-border);border-bottom:none;font-weight:700;}
+  .output-table td.qty{
+    text-align:right;
+    font-weight:600;
+    color:var(--panel-text);
+    font-size:14px;
+  }
+  .output-table tr.highlight td{
+    background:rgba(59,130,246,0.04);
+    font-weight:600;
+  }
+  .output-table tr.highlight td.qty{
+    font-size:16px;
+    color:var(--primary);
+  }
+  .output-empty{
+    padding:40px 20px;
+    text-align:center;
+    color:var(--panel-text-muted);
+    font-style:italic;
+    font-size:13px;
+  }
+
+  /* Calculate button */
+  .calc-btn-row{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+  }
+  .btn-calculate{
+    flex:1;
+    font-family:var(--font-sans);
+    font-size:14px;
+    font-weight:600;
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius);
+    padding:12px 20px;
+    cursor:pointer;
+    transition:background var(--transition),transform 0.1s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .btn-calculate:hover{background:var(--primary-hover);}
+  .btn-calculate:active{transform:scale(0.98);}
+
+  .btn-add-boq{
+    width:100%;
+    font-family:var(--font-sans);
+    font-size:14px;
+    font-weight:600;
+    background:var(--success);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius);
+    padding:14px 20px;
+    cursor:pointer;
+    margin-top:12px;
+    transition:background var(--transition),transform 0.1s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .btn-add-boq:hover{background:#16a34a;}
+  .btn-add-boq:active{transform:scale(0.98);}
+  .btn-add-boq:disabled{
+    background:var(--panel-border);
+    color:var(--panel-text-muted);
+    cursor:not-allowed;
+    transform:none;
+  }
 
   /* ---- Buttons ---- */
   .btn{
@@ -418,7 +614,7 @@
     color:var(--panel-text-muted);
   }
   .btn.ghost:hover{background:rgba(0,0,0,0.04);color:var(--panel-text);border-color:var(--panel-text-muted);}
-  .btn.small{padding:6px 10px;font-size:11px;}
+  .btn.small{padding:7px 14px;font-size:11px;}
 
   /* ---- Ledger ---- */
   .ledger{
@@ -712,20 +908,28 @@
       </div>
     </div>
     <div>
-      <div class="titleblock">
-        <div>
-          <div class="sub" id="projectSubtitle">Ref. Max B. Fajardo — Simplified Construction Estimate</div>
-          <h1 id="projectTitle">Estimate Calculator</h1>
+      <div class="app-header">
+        <div class="header-left">
+          <div class="project-name" id="projectTitle">Estimate Calculator</div>
+          <div class="project-meta" id="projectMeta">
+            <span id="projectLocation"></span>
+            <span class="sep" id="metaSep" style="display:none;">•</span>
+            <span id="projectDate"></span>
+          </div>
+          <div class="current-module" id="currentModule">Excavation</div>
+          <div class="header-secondary">
+            <span>Ref. Max B. Fajardo</span>
+            <span>SI Units</span>
+            <span>₱ PHP</span>
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:20px;">
-          <div class="meta">
-            <div>SHEET: <b>01</b> OF <b>01</b></div>
-            <div>UNITS: <b>METRIC (SI)</b></div>
-            <div>CURRENCY: <b>₱ PHP</b></div>
+        <div class="header-right">
+          <div class="header-actions">
+            <button class="btn ghost small" id="exportPdfBtn" onclick="exportPDF()">Export PDF</button>
+            <button class="btn ghost small" id="exportExcelBtn" onclick="exportExcel()">Export Excel</button>
+            <button class="btn small" id="newProjectBtn" style="display:none;">+ New Project</button>
           </div>
-          <div class="user-info" id="userInfo">
-            <button class="logout-btn" id="newProjectBtn" style="display:none;" title="New Project">+ New Project</button>
-          </div>
+          <div class="user-info" id="userInfo"></div>
         </div>
       </div>
 
@@ -1911,6 +2115,8 @@ function renderTabs(){
   // Admin visibility
   const adminBtn = document.getElementById('adminNavBtn');
   if(adminBtn) adminBtn.style.display = (currentUser?.email === ADMIN_EMAIL) ? '' : 'none';
+  // Update module name in header
+  updateHeader();
 }
 
 /* Mobile sidebar */
@@ -2369,9 +2575,10 @@ function renderPanel(){
     return;
   }
   
-  panel.style.gridTemplateColumns = '300px 1fr';
+  panel.style.gridTemplateColumns = '340px 1fr';
   // left column: inputs
   const left = document.createElement('div');
+  left.className = 'calc-inputs';
   left.innerHTML = `<h2>${m.title}</h2><div class="desc">${m.desc}</div>`;
 
   m.fields.forEach(f=>{
@@ -2379,7 +2586,9 @@ function renderPanel(){
     wrap.className='field';
     wrap.dataset.fieldId = f.id;
     if(f.type==='select'){
-      wrap.innerHTML = `<label id="lbl_${f.id}">${f.label}</label>
+      wrap.innerHTML = `<label id="lbl_${f.id}">${f.label}
+        ${f.unit ? `<span class="unit-badge">${f.unit}</span>` : ''}
+      </label>
         <select id="f_${f.id}">
           ${f.options.map(o=>`<option value="${o.v}" ${o.v===f.def?'selected':''}>${o.t}</option>`).join('')}
         </select>`;
@@ -2387,7 +2596,9 @@ function renderPanel(){
       wrap.innerHTML = `<label id="lbl_${f.id}">${f.label}</label>
         <input id="f_${f.id}" type="text" value="${f.def}">`;
     } else {
-      wrap.innerHTML = `<label id="lbl_${f.id}">${f.label} <span class="hint">(${f.unit})</span></label>
+      wrap.innerHTML = `<label id="lbl_${f.id}">${f.label}
+        ${f.unit ? `<span class="unit-badge">${f.unit}</span>` : ''}
+      </label>
         <input id="f_${f.id}" type="number" step="any" value="${f.def}">`;
     }
     left.appendChild(wrap);
@@ -2441,9 +2652,14 @@ function renderPanel(){
 
   // right column: output
   const right = document.createElement('div');
-  right.className='output';
-  right.innerHTML = `<table><thead><tr><th>Item</th><th style="text-align:right">Qty</th><th>Unit</th></tr></thead><tbody id="outBody"></tbody></table>
-    <button class="btn" id="addBtn">+ Add to Estimate</button>`;
+  right.className='calc-output';
+  right.innerHTML = `
+    <div class="output-section">
+      <div class="output-header">Calculation Results</div>
+      <div id="outputContent" class="output-empty">Enter values and click Calculate to see results.</div>
+    </div>
+    <button class="btn-add-boq" id="addBtn" disabled>+ Add to Estimate</button>
+  `;
 
   panel.appendChild(left);
   panel.appendChild(right);
@@ -2471,10 +2687,28 @@ function renderPanel(){
   function recompute(){
     const v = readVals(), c = readCoeffs();
     lastResults = m.compute(v,c);
-    const body = document.getElementById('outBody');
-    body.innerHTML = lastResults.map(r=>
-      `<tr><td>${r.item}</td><td class="qty">${fmt(r.qty)}</td><td>${r.unit}</td></tr>`
-    ).join('');
+    const content = document.getElementById('outputContent');
+    const addBtn = document.getElementById('addBtn');
+    
+    if(lastResults.length === 0){
+      content.className = 'output-empty';
+      content.innerHTML = 'Enter values and click Calculate to see results.';
+      addBtn.disabled = true;
+      return;
+    }
+    
+    content.className = '';
+    let html = '<table class="output-table"><thead><tr><th>Item</th><th style="text-align:right">Qty</th><th>Unit</th></tr></thead><tbody>';
+    
+    lastResults.forEach((r, i) => {
+      const isHidden = r.hidden;
+      const rowClass = (!isHidden && i < 3) ? ' class="highlight"' : '';
+      html += `<tr${rowClass}><td>${r.item}</td><td class="qty">${fmt(r.qty)}</td><td>${r.unit}</td></tr>`;
+    });
+    
+    html += '</tbody></table>';
+    content.innerHTML = html;
+    addBtn.disabled = false;
   }
   panel.querySelectorAll('input,select').forEach(el=>{
     el.addEventListener('input', recompute);
@@ -2831,6 +3065,7 @@ document.getElementById('startBtn').onclick = () => {
   mainApp.style.display = 'block';
   db.collection('users').doc(currentUser.uid).set({ projectInfo }, { merge: true });
   loadUserData();
+  updateHeader();
   showToast('Project created');
 };
 
@@ -2918,6 +3153,27 @@ function showUserInfo(user, isAdmin){
     }
   };
   if(isAdmin) adminTab.style.display = 'block';
+  updateHeader();
+}
+
+function updateHeader(){
+  const titleEl = document.getElementById('projectTitle');
+  const locEl = document.getElementById('projectLocation');
+  const dateEl = document.getElementById('projectDate');
+  const sepEl = document.getElementById('metaSep');
+  const modEl = document.getElementById('currentModule');
+  
+  titleEl.textContent = projectInfo.title || 'Estimate Calculator';
+  
+  const hasLoc = projectInfo.location && projectInfo.location.trim();
+  const hasDate = projectInfo.date && projectInfo.date.trim();
+  
+  locEl.textContent = hasLoc ? projectInfo.location : '';
+  dateEl.textContent = hasDate ? projectInfo.date : '';
+  sepEl.style.display = (hasLoc && hasDate) ? 'inline' : 'none';
+  
+  const m = modules[activeTab];
+  modEl.textContent = m ? m.label : activeTab;
 }
 
 /* ---- Load user data ---- */
