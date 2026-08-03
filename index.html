@@ -1014,34 +1014,108 @@
     display:none;align-items:center;justify-content:center;z-index:9999;
   }
   .login-overlay{display:flex;}
-  .login-box,.access-box,.project-box{
+  .login-container{
+    display:flex;flex-direction:column;align-items:center;
+    padding:20px;
+  }
+  .login-card{
     background:var(--surface);
     border:1px solid var(--border);
-    border-radius:var(--radius-lg);
+    border-radius:16px;
+    padding:48px 40px;
+    text-align:center;
+    max-width:380px;width:100%;
+    box-shadow:var(--shadow-lg);
+  }
+  .login-logo{
+    display:flex;justify-content:center;margin-bottom:24px;
+  }
+  .login-logo-icon{
+    width:56px;height:56px;
+    background:linear-gradient(135deg, var(--primary), #2563eb);
+    border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-weight:800;font-size:24px;color:#fff;
+    box-shadow:0 4px 12px rgba(59,130,246,0.3);
+  }
+  .login-title{
+    margin:0 0 8px;
+    font-family:var(--font-display);
+    font-size:28px;
+    font-weight:800;
+    color:var(--text);
+    letter-spacing:0.5px;
+  }
+  .login-subtitle{
+    margin:0 0 32px;
+    font-family:var(--font-sans);
+    font-size:15px;
+    color:var(--text-muted);
+    line-height:1.5;
+  }
+  .login-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    width:100%;padding:13px 24px;
+    background:var(--primary);color:#fff;
+    border:none;border-radius:var(--radius);
+    font-family:var(--font-sans);font-size:14px;font-weight:600;
+    cursor:pointer;letter-spacing:0.3px;
+    transition:background var(--transition),transform 0.1s;
+  }
+  .login-btn:hover{background:var(--primary-hover);}
+  .login-btn:active{transform:scale(0.98);}
+  .login-btn-icon{width:18px;height:18px;}
+  .login-footer{
+    margin-top:28px;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    font-family:var(--font-sans);font-size:12px;color:var(--text-dim);
+  }
+  .login-footer-icon{font-size:12px;}
+  .login-reference{
+    margin-top:24px;
+    font-family:var(--font-mono);font-size:10px;
+    color:var(--text-dim);letter-spacing:0.5px;
+  }
+
+  .access-box,.project-box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
     padding:48px 40px;
     text-align:center;
     max-width:420px;width:90%;
     position:relative;
     box-shadow:var(--shadow-lg);
   }
-  .login-box h2,.access-box h2,.project-box h2{
+  .access-box h2,.project-box h2{
     margin:0 0 8px;
     font-family:var(--font-display);
-    font-size:28px;
+    font-size:24px;
     color:var(--text);
-    letter-spacing:2px;
+    letter-spacing:0.5px;
     font-weight:800;
   }
-  .login-box p,.access-box p,.project-box p{
-    margin:0 0 28px;
+  .access-box p,.project-box p{
+    margin:0 0 24px;
     font-family:var(--font-sans);
     font-size:14px;
     color:var(--text-muted);
+    line-height:1.5;
   }
   .access-box .icon{font-size:48px;margin-bottom:16px;}
+  .access-box .google-btn{
+    display:inline-flex;align-items:center;
+    background:var(--primary);color:#fff;
+    border:none;border-radius:var(--radius);
+    padding:12px 24px;
+    font-family:var(--font-sans);font-size:14px;font-weight:600;
+    cursor:pointer;letter-spacing:0.5px;
+    transition:background var(--transition);
+  }
+  .access-box .google-btn:hover{background:var(--primary-hover);}
   .project-box input{
     width:100%;
-    padding:11px 14px;
+    padding:12px 14px;
     margin-bottom:12px;
     background:var(--surface-2);
     border:1px solid var(--border);
@@ -1054,28 +1128,18 @@
   }
   .project-box input::placeholder{color:var(--text-dim);}
   .project-box input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(59,130,246,0.15);}
-  .google-btn{
-    display:inline-flex;align-items:center;
-    background:var(--primary);color:#fff;
-    border:none;border-radius:var(--radius);
-    padding:12px 24px;
-    font-family:var(--font-sans);font-size:14px;font-weight:600;
-    cursor:pointer;letter-spacing:0.5px;
-    transition:background var(--transition),transform 0.1s;
-  }
-  .google-btn:hover{background:var(--primary-hover);}
-  .google-btn:active{transform:scale(0.98);}
-  .google-btn img{width:18px;margin-right:10px;}
   .btn-start{
     display:inline-block;
     background:var(--primary);color:#fff;
     border:none;border-radius:var(--radius);
     padding:12px 24px;
     font-family:var(--font-sans);font-size:14px;font-weight:600;
-    cursor:pointer;letter-spacing:0.5px;margin-top:10px;
+    cursor:pointer;letter-spacing:0.5px;margin-top:8px;
     transition:background var(--transition),transform 0.1s;
+    width:100%;
   }
   .btn-start:hover{background:var(--primary-hover);}
+  .btn-start:active{transform:scale(0.98);}
 
   /* ---- Spinner ---- */
   .spinner{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
@@ -1412,6 +1476,142 @@
   @media(max-width:480px){
     .toast{left:16px;right:16px;bottom:16px;max-width:none;}
   }
+
+  /* ===== COMPREHENSIVE RESPONSIVE DESIGN ===== */
+  
+  /* Large tablets / small laptops */
+  @media(max-width:1200px){
+    .app-layout{grid-template-columns:200px 1fr;}
+    .nav-item{font-size:12px;padding:6px 8px;}
+    .nav-item .icon{width:16px;font-size:12px;}
+    .nav-category-header{font-size:8px;padding:12px 12px 5px;}
+    .sidebar-header .app-name{font-size:13px;}
+  }
+  
+  /* Tablets */
+  @media(max-width:1024px){
+    .app-layout{grid-template-columns:180px 1fr;}
+    .panel{grid-template-columns:280px 1fr;gap:20px;padding:20px;}
+    .estimate-header{padding:16px;}
+    .estimate-table th,.estimate-table td{padding:8px 10px;font-size:12px;}
+    .price-db-table th,.price-db-table td{padding:8px 10px;font-size:12px;}
+  }
+  
+  /* Mobile landscape / small tablets */
+  @media(max-width:900px){
+    .panel{grid-template-columns:1fr;}
+    .calc-output{margin-top:16px;}
+    .ref-values{margin-top:16px;}
+    .app-header{flex-direction:column;align-items:stretch;}
+    .header-right{justify-content:flex-start;}
+    .header-actions{flex-wrap:wrap;}
+  }
+  
+  /* Mobile portrait */
+  @media(max-width:768px){
+    body{padding:12px 10px 40px;}
+    .wrap{max-width:100%;}
+    
+    /* Sidebar becomes drawer */
+    .menu-toggle{display:flex;}
+    .sidebar-overlay.active{display:block;}
+    .sidebar{
+      position:fixed;top:0;left:0;bottom:0;
+      width:260px;z-index:1000;
+      transform:translateX(-100%);
+      transition:transform 0.25s ease;
+      border-radius:0 var(--radius-lg) var(--radius-lg) 0;
+    }
+    .sidebar.open{transform:translateX(0);}
+    .app-layout{grid-template-columns:1fr;min-height:calc(100vh - 80px);}
+    
+    /* Header */
+    .app-header{padding:16px;gap:12px;}
+    .project-name{font-size:18px;}
+    .project-meta{font-size:12px;}
+    .current-module{font-size:10px;margin-top:6px;}
+    .header-right{flex-direction:column;align-items:stretch;gap:10px;}
+    .header-actions{justify-content:flex-start;}
+    .header-secondary{display:none;}
+    .titleblock{margin-left:0;}
+    
+    /* Panel */
+    .panel{padding:16px;gap:16px;}
+    .panel h2{font-size:18px;}
+    .field label{font-size:10px;}
+    .field input,.field select{padding:10px 12px;font-size:14px;}
+    
+    /* Estimate section */
+    .estimate-section{margin-top:12px;}
+    .estimate-header{flex-direction:column;align-items:stretch;gap:8px;}
+    .estimate-header-right{text-align:left;}
+    .estimate-total-value{font-size:24px;}
+    .estimate-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .estimate-table{min-width:600px;}
+    .estimate-table th.col-category,.estimate-table td.col-category{display:none;}
+    .estimate-footer{flex-direction:column;align-items:stretch;gap:8px;}
+    .estimate-footer-actions{justify-content:flex-end;}
+    
+    /* Price DB */
+    .price-db{padding:16px;}
+    .price-db-header{flex-direction:column;gap:10px;}
+    .price-db-search{flex-direction:column;}
+    .price-db-table-wrap{overflow-x:auto;}
+    .price-db-table{min-width:500px;}
+    .price-db-table th.col-unit,.price-db-table td.col-unit{display:none;}
+    
+    /* Modals */
+    .modal{max-width:calc(100% - 32px);margin:16px;}
+    .modal-header{padding:16px 20px 12px;}
+    .modal-body{padding:16px 20px;}
+    .modal-footer{padding:12px 20px 16px;}
+    
+    /* Login */
+    .login-card{padding:32px 24px;}
+    .login-title{font-size:24px;}
+    .access-box,.project-box{padding:32px 24px;}
+    
+    /* Ledger */
+    .ledger{padding:16px;}
+  }
+  
+  /* Small phones */
+  @media(max-width:480px){
+    body{padding:8px 6px 32px;}
+    .app-header{padding:12px;}
+    .project-name{font-size:16px;}
+    .estimate-total-value{font-size:20px;}
+    .estimate-table{min-width:500px;}
+    .estimate-table th.col-unit,.estimate-table td.col-unit{display:none;}
+    .btn{padding:8px 14px;font-size:11px;}
+    .btn.small{padding:6px 10px;font-size:10px;}
+    .login-card{padding:24px 16px;}
+    .login-logo-icon{width:48px;height:48px;font-size:20px;}
+    .login-title{font-size:22px;}
+    .login-subtitle{font-size:13px;}
+  }
+  
+  /* Landscape phones */
+  @media(max-height:500px) and (orientation:landscape){
+    .login-overlay{align-items:flex-start;padding-top:20px;}
+    .login-card{padding:20px;}
+    .login-logo{margin-bottom:12px;}
+    .login-logo-icon{width:40px;height:40px;font-size:18px;}
+    .login-title{font-size:20px;margin-bottom:4px;}
+    .login-subtitle{margin-bottom:16px;font-size:12px;}
+    .login-btn{padding:10px 20px;}
+    .login-footer{margin-top:12px;}
+  }
+  
+  /* Print */
+  @media print{
+    .sidebar,.menu-toggle,.sidebar-overlay,.header-actions,.estimate-footer,
+    .btn,.toast,.save-indicator,.spinner,.modal-overlay{display:none!important;}
+    .app-layout{grid-template-columns:1fr!important;}
+    .app-header{border:none;box-shadow:none;}
+    .estimate-section{border:none;box-shadow:none;}
+    body{background:#fff;color:#000;padding:0;}
+  }
 </head>
 <body>
 <div class="spinner" id="spinner"></div>
@@ -1444,31 +1644,41 @@
 </div>
 
 <div class="login-overlay" id="loginOverlay">
-  <div class="login-box">
-    <div style="font-size:11px;letter-spacing:4px;color:var(--yellow);margin-bottom:20px;">CONSTRUCTION ESTIMATE</div>
-    <h2>SIGN IN</h2>
-    <p>Access your estimates from any device.</p>
-    <button class="google-btn" id="loginBtn">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
-      Continue with Google
-    </button>
-    <div style="margin-top:30px;font-size:11px;color:var(--yellow);">Based on Max B. Fajardo's Simplified Construction Estimate</div>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-logo-icon">E</div>
+      </div>
+      <h1 class="login-title">Estimate Pro</h1>
+      <p class="login-subtitle">Construction estimating<br>made simple.</p>
+      <button class="login-btn" id="loginBtn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" class="login-btn-icon">
+        Continue with Google
+      </button>
+      <div class="login-footer">
+        <div class="login-footer-icon">🔒</div>
+        <span>Secure project-based access</span>
+      </div>
+    </div>
+    <div class="login-reference">Based on Max B. Fajardo's Simplified Construction Estimate</div>
   </div>
 </div>
 
 <div class="access-overlay" id="accessOverlay">
   <div class="access-box">
-    <div class="icon">&#128274;</div>
-    <h2>NO ACCESS</h2>
+    <div class="icon">🔒</div>
+    <h2>No Access</h2>
     <p>Your account has not been activated yet. Contact the admin to get access.</p>
-    <button class="google-btn" onclick="auth.signOut()" style="background:var(--cyan);color:var(--chalk);margin-top:10px;">Sign Out</button>
+    <button class="google-btn" onclick="auth.signOut()">Sign Out</button>
   </div>
 </div>
 
 <div class="project-overlay" id="projectOverlay">
   <div class="project-box">
-    <div style="font-size:11px;letter-spacing:4px;color:var(--yellow);margin-bottom:20px;">NEW PROJECT</div>
-    <h2>PROJECT INFO</h2>
+    <div class="login-logo">
+      <div class="login-logo-icon">E</div>
+    </div>
+    <h2>New Project</h2>
     <p>Enter your project details before proceeding.</p>
     <input type="text" id="projTitle" placeholder="Project Title (e.g. Residential House)">
     <input type="text" id="projLocation" placeholder="Project Location">
