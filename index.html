@@ -124,18 +124,52 @@
   .sidebar{
     background:rgba(0,0,0,0.3);
     border-right:1px solid rgba(255,255,255,0.1);
-    padding:16px 0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
   }
-  .sidebar-title{
+  .sidebar-section{}
+  .sidebar-section-title{
     font-family:'IBM Plex Mono',monospace;
     font-size:9px;
     letter-spacing:2px;
     text-transform:uppercase;
-    color:var(--yellow);
-    padding:0 14px 10px;
+    color:var(--chalk);
+    padding:14px 14px 10px;
     border-bottom:1px solid rgba(255,255,255,0.1);
-    margin-bottom:8px;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    user-select:none;
   }
+  .sidebar-section-title:hover{background:rgba(255,255,255,0.05);}
+  .sidebar-section-title .arrow{transition:transform 0.2s;font-size:10px;}
+  .sidebar-section.collapsed .tabs{display:none;}
+  .sidebar-section.collapsed .arrow{transform:rotate(-90deg);}
+  .sidebar-bottom{
+    border-top:1px solid rgba(255,255,255,0.1);
+    padding:8px 0;
+  }
+  .sidebar-btn{
+    display:block;
+    width:100%;
+    text-align:left;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    background:transparent;
+    color:var(--yellow);
+    border:none;
+    border-left:3px solid transparent;
+    padding:10px 14px;
+    cursor:pointer;
+    transition:all 0.15s;
+  }
+  .sidebar-btn:hover{color:var(--chalk);background:rgba(255,255,255,0.05);}
+  .sidebar-btn.active{color:var(--chalk);border-left-color:var(--chalk);background:rgba(255,255,255,0.08);font-weight:600;}
 
   .panel{
     background:var(--vellum);
@@ -408,30 +442,36 @@
 
 <div class="wrap" id="mainApp" style="display:none;">
 
-  <div class="titleblock">
-    <div>
-      <div class="sub" id="projectSubtitle">Ref. Max B. Fajardo — Simplified Construction Estimate</div>
-      <h1 id="projectTitle">Estimate Calculator</h1>
-    </div>
-    <div style="display:flex;align-items:center;gap:20px;">
-      <div class="meta">
-        <div>SHEET: <b>01</b> OF <b>01</b></div>
-        <div>UNITS: <b>METRIC (SI)</b></div>
-        <div>CURRENCY: <b>₱ PHP</b></div>
-      </div>
-      <div class="user-info" id="userInfo">
-      <button class="logout-btn" id="newProjectBtn" style="display:none;" title="New Project">+ New Project</button>
-    </div>
-    </div>
-    </div>
-  </div>
-
   <div class="app-layout">
     <div class="sidebar">
-      <div class="sidebar-title">Calculators</div>
-      <div class="tabs" id="tabs"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title" id="calcToggle">Calculators <span class="arrow">&#9662;</span></div>
+        <div class="tabs" id="tabs"></div>
+      </div>
+      <div class="sidebar-bottom">
+        <button class="sidebar-btn" data-key="pricelist">Price List</button>
+        <button class="sidebar-btn" data-key="estimate">Master BOQ</button>
+        <button class="sidebar-btn" data-key="admin" id="adminSidebar" style="display:none;">Admin</button>
+      </div>
     </div>
     <div>
+      <div class="titleblock">
+        <div>
+          <div class="sub" id="projectSubtitle">Ref. Max B. Fajardo — Simplified Construction Estimate</div>
+          <h1 id="projectTitle">Estimate Calculator</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;">
+          <div class="meta">
+            <div>SHEET: <b>01</b> OF <b>01</b></div>
+            <div>UNITS: <b>METRIC (SI)</b></div>
+            <div>CURRENCY: <b>₱ PHP</b></div>
+          </div>
+          <div class="user-info" id="userInfo">
+            <button class="logout-btn" id="newProjectBtn" style="display:none;" title="New Project">+ New Project</button>
+          </div>
+        </div>
+      </div>
+
       <div class="panel" id="panel"></div>
 
       <div class="ledger">
@@ -1535,7 +1575,8 @@ const modules = {
 /* ---------------- render tabs ---------------- */
 const tabsEl = document.getElementById('tabs');
 const ADMIN_EMAIL = 'jkylemagdalas21@gmail.com';
-Object.keys(modules).forEach(key=>{
+const calcKeys = Object.keys(modules).filter(k => k !== 'estimate' && k !== 'pricelist');
+calcKeys.forEach(key=>{
   const b = document.createElement('button');
   b.className = 'tab' + (key===activeTab?' active':'');
   b.textContent = modules[key].label;
@@ -1543,15 +1584,23 @@ Object.keys(modules).forEach(key=>{
   b.dataset.key = key;
   tabsEl.appendChild(b);
 });
-const adminTab = document.createElement('button');
-adminTab.className = 'tab';
-adminTab.textContent = 'Admin';
-adminTab.dataset.key = 'admin';
-adminTab.style.display = 'none';
+
+const adminTab = document.getElementById('adminSidebar');
 adminTab.onclick = ()=>{ activeTab = 'admin'; renderTabs(); renderPanel(); };
-tabsEl.appendChild(adminTab);
+
+document.querySelectorAll('.sidebar-btn').forEach(btn => {
+  btn.onclick = ()=>{ activeTab = btn.dataset.key; renderTabs(); renderPanel(); };
+});
+
+document.getElementById('calcToggle').onclick = ()=>{
+  document.querySelector('.sidebar-section').classList.toggle('collapsed');
+};
+
 function renderTabs(){
-  [...tabsEl.children].forEach(b=>{
+  tabsEl.querySelectorAll('.tab').forEach(b=>{
+    b.classList.toggle('active', b.dataset.key===activeTab);
+  });
+  document.querySelectorAll('.sidebar-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.key===activeTab);
   });
 }
@@ -1560,7 +1609,14 @@ function renderTabs(){
 function renderPanel(){
   const m = modules[activeTab];
   const panel = document.getElementById('panel');
+  const ledgerEl = document.querySelector('.ledger');
   panel.innerHTML = '';
+  
+  if(activeTab === 'admin' || activeTab === 'estimate'){
+    ledgerEl.style.display = 'none';
+  } else {
+    ledgerEl.style.display = 'block';
+  }
 
   if(activeTab === 'pricelist'){
     panel.style.gridTemplateColumns = '1fr';
@@ -2482,7 +2538,7 @@ auth.onAuthStateChanged(user => {
         } else {
           if(isAdmin){
             mainApp.style.display = 'block';
-            adminTab.style.display = 'inline-block';
+            adminTab.style.display = 'block';
             showUserInfo(user, isAdmin);
             projectOverlay.style.display = 'flex';
           } else {
@@ -2539,7 +2595,7 @@ function showUserInfo(user, isAdmin){
       mainApp.style.display = 'none';
     }
   };
-  if(isAdmin) adminTab.style.display = 'inline-block';
+  if(isAdmin) adminTab.style.display = 'block';
 }
 
 /* ---- Load user data ---- */
