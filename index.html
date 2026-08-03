@@ -879,6 +879,8 @@
   .estimate-table td.col-amount{
     font-weight:600;
     color:var(--text);
+    white-space:nowrap;
+    text-align:right;
   }
   .estimate-table tr:hover{
     background:rgba(255,255,255,0.02);
@@ -1723,7 +1725,7 @@
           </div>
           <div class="estimate-header-right">
             <div class="estimate-total-label">Estimated Total</div>
-            <div class="estimate-total-value" id="grandTotal">₱ 0.00</div>
+            <div class="estimate-total-value" id="grandTotal">₱0.00</div>
           </div>
         </div>
         
@@ -3444,7 +3446,7 @@ function renderPanel(){
           <td style="text-align:right;padding:8px;border-bottom:1px solid #ddd;font-weight:600;">${fmt(row.qty)}</td>
           <td style="padding:8px;border-bottom:1px solid #ddd;">${row.unit}</td>
           <td style="text-align:right;padding:8px;border-bottom:1px solid #ddd;"><input class="est-cost" data-id="${row.id}" type="number" step="any" value="${row.cost||''}" placeholder="0.00" style="width:100px;text-align:right;border:1px solid #ccc;padding:4px;font-family:'IBM Plex Mono',monospace;font-size:13px;"></td>
-          <td style="text-align:right;padding:8px;border-bottom:1px solid #ddd;font-weight:600;" class="est-amount">₱ ${fmt(amount)}</td>
+          <td style="text-align:right;padding:8px;border-bottom:1px solid #ddd;font-weight:600;" class="est-amount">₱${fmt(amount)}</td>
           <td style="padding:8px;border-bottom:1px solid #ddd;"><button class="est-rm" data-id="${row.id}" style="background:none;border:none;color:#c00;cursor:pointer;font-size:16px;">×</button></td>
         </tr>`;
       });
@@ -3452,7 +3454,7 @@ function renderPanel(){
       const grand = ledger.reduce((s,r) => s + r.qty * r.cost, 0);
       html += `</tbody><tfoot><tr>
         <td colspan="4" style="padding:12px 8px;border-top:2px solid #333;font-weight:700;font-size:14px;">GRAND TOTAL</td>
-        <td style="text-align:right;padding:12px 8px;border-top:2px solid #333;font-weight:700;font-size:16px;color:#d4a017;" id="estGrandTotal">₱ ${fmt(grand)}</td>
+          <td style="text-align:right;padding:12px 8px;border-top:2px solid #333;font-weight:700;font-size:16px;color:#d4a017;" id="estGrandTotal">₱${fmt(grand)}</td>
         <td style="padding:12px 8px;border-top:2px solid #333;"></td>
       </tr></tfoot></table>`;
       
@@ -3468,10 +3470,10 @@ function renderPanel(){
         if(row){
           row.cost = parseFloat(e.target.value) || 0;
           const amount = row.qty * row.cost;
-          e.target.closest('tr').querySelector('.est-amount').textContent = '₱ ' + fmt(amount);
+          e.target.closest('tr').querySelector('.est-amount').textContent = '₱' + fmt(amount);
           const grand = ledger.reduce((s,r) => s + r.qty * r.cost, 0);
-          document.getElementById('estGrandTotal').textContent = '₱ ' + fmt(grand);
-          document.getElementById('grandTotal').textContent = '₱ ' + fmt(grand);
+          document.getElementById('estGrandTotal').textContent = '₱' + fmt(grand);
+          document.getElementById('grandTotal').textContent = '₱' + fmt(grand);
         }
       });
     });
@@ -3723,7 +3725,7 @@ function renderLedger(){
     emptyMsg.style.display = 'block';
     tableWrap.style.display = 'none';
     countEl.textContent = '0 items';
-    totalEl.textContent = '₱ 0.00';
+    totalEl.textContent = '₱0.00';
     return;
   }
   
@@ -3766,13 +3768,13 @@ function renderLedger(){
         <td class="num col-qty">${fmt(row.qty)}</td>
         <td class="col-unit">${row.unit}</td>
         <td class="col-cost"><input class="cost" type="number" step="any" value="${row.cost||''}" placeholder="0.00"></td>
-        <td class="num col-amount amount-cell">₱ ${fmt(amount)}</td>
+        <td class="num col-amount amount-cell">₱${fmt(amount)}</td>
         <td class="col-action"><button class="rm" title="remove">×</button></td>
       `;
       
       tr.querySelector('.cost').addEventListener('input', (e) => {
         row.cost = parseFloat(e.target.value) || 0;
-        tr.querySelector('.amount-cell').textContent = '₱ ' + fmt(row.qty * row.cost);
+        tr.querySelector('.amount-cell').textContent = '₱' + fmt(row.qty * row.cost);
         updateEstimateTotal();
       });
       
@@ -3791,7 +3793,7 @@ function renderLedger(){
 function updateEstimateTotal(){
   const grand = ledger.reduce((s, r) => s + r.qty * r.cost, 0);
   const totalEl = document.getElementById('grandTotal');
-  if(totalEl) totalEl.textContent = '₱ ' + fmt(grand);
+  if(totalEl) totalEl.textContent = '₱' + fmt(grand);
 }
 
 function clearLedger(){
@@ -4501,6 +4503,14 @@ auth.onAuthStateChanged(user => {
     });
   } else {
     currentUser = null;
+    projectInfo = {};
+    ledger = [];
+    ledgerIdSeq = 1;
+    priceDB = {};
+    document.getElementById('projTitle').value = '';
+    document.getElementById('projLocation').value = '';
+    document.getElementById('projOwner').value = '';
+    document.getElementById('projDate').value = '';
     loginOverlay.style.display = 'flex';
     mainApp.style.display = 'none';
     accessOverlay.style.display = 'none';
