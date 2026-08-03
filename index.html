@@ -1137,12 +1137,302 @@
     transition:all var(--transition);
   }
   .logout-btn:hover{border-color:var(--text-muted);color:var(--text);background:rgba(255,255,255,0.04);}
-</style>
+
+  /* ---- Price Database ---- */
+  .price-db{
+    background:var(--panel-bg);
+    color:var(--panel-text);
+    padding:28px;
+  }
+  .price-db-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .price-db-header h2{
+    font-family:var(--font-display);
+    font-size:22px;
+    text-transform:uppercase;
+    margin:0 0 4px 0;
+    letter-spacing:0.5px;
+    color:var(--panel-text);
+  }
+  .price-db-header .desc{
+    font-size:13px;
+    color:var(--panel-text-muted);
+    margin:0;
+  }
+  .price-db-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .price-db-search{
+    display:flex;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .price-db-search input{
+    flex:1;
+    font-family:var(--font-sans);
+    font-size:13px;
+    padding:9px 12px;
+    border:1px solid var(--panel-input-border);
+    border-radius:var(--radius);
+    background:var(--panel-input-bg);
+    color:var(--panel-text);
+    transition:border-color var(--transition),box-shadow var(--transition);
+  }
+  .price-db-search input:focus{
+    outline:none;
+    border-color:var(--panel-input-focus);
+    box-shadow:0 0 0 3px rgba(59,130,246,0.15);
+  }
+  .price-db-search input::placeholder{color:var(--panel-text-muted);}
+  .price-db-stats{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--panel-text-muted);
+    margin-bottom:12px;
+    display:flex;
+    gap:16px;
+  }
+  .price-db-stats span{opacity:0.7;}
+  .price-db-stats b{color:var(--panel-text);font-weight:600;}
+  .price-db-table-wrap{
+    background:var(--panel-surface);
+    border:1px solid var(--panel-border);
+    border-radius:var(--radius-lg);
+    overflow:hidden;
+  }
+  .price-db-table{
+    width:100%;
+    border-collapse:collapse;
+    font-family:var(--font-mono);
+    font-size:13px;
+  }
+  .price-db-table thead{position:sticky;top:0;z-index:1;}
+  .price-db-table th{
+    text-align:left;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--panel-text-muted);
+    padding:10px 12px;
+    border-bottom:2px solid var(--panel-border);
+    font-weight:600;
+    background:var(--panel-surface);
+    white-space:nowrap;
+  }
+  .price-db-table th.col-price,.price-db-table th.col-actions{text-align:right;}
+  .price-db-table td{
+    padding:10px 12px;
+    border-bottom:1px solid var(--panel-border);
+    color:var(--panel-text);
+    vertical-align:middle;
+  }
+  .price-db-table tr:hover{background:rgba(0,0,0,0.02);}
+  .price-db-table tr.category-header td{
+    background:var(--panel-bg);
+    font-weight:600;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--panel-text-muted);
+    padding:8px 12px;
+    border-bottom:1px solid var(--panel-border);
+  }
+  .price-db-table tr.category-header td::before{
+    content:"";
+    display:inline-block;
+    width:4px;height:12px;
+    background:var(--primary);
+    border-radius:2px;
+    margin-right:8px;
+    vertical-align:middle;
+  }
+  .price-db-table td.col-material{font-weight:500;}
+  .price-db-table td.col-unit{color:var(--panel-text-muted);font-size:12px;}
+  .price-db-table td.col-price{text-align:right;}
+  .price-db-table td.col-actions{text-align:right;white-space:nowrap;}
+  .price-db-table .price-input{
+    width:100px;
+    font-family:var(--font-mono);
+    font-size:13px;
+    padding:6px 10px;
+    border:1px solid var(--panel-input-border);
+    border-radius:var(--radius);
+    background:var(--panel-input-bg);
+    color:var(--panel-text);
+    text-align:right;
+    transition:border-color var(--transition),box-shadow var(--transition);
+  }
+  .price-db-table .price-input:focus{
+    outline:none;
+    border-color:var(--panel-input-focus);
+    box-shadow:0 0 0 3px rgba(59,130,246,0.15);
+  }
+  .price-db-table .price-value{
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+  }
+  .price-db-table .price-value.has-price{color:var(--panel-text);}
+  .price-db-table .price-value.no-price{color:var(--panel-text-muted);font-style:italic;font-weight:400;}
+  .price-db-table .btn-edit,.price-db-table .btn-save,.price-db-table .btn-cancel,.price-db-table .btn-delete{
+    background:none;border:none;cursor:pointer;font-size:12px;padding:4px 8px;border-radius:var(--radius);transition:all var(--transition);
+  }
+  .price-db-table .btn-edit{color:var(--primary);}
+  .price-db-table .btn-edit:hover{background:var(--primary-dim);}
+  .price-db-table .btn-save{color:var(--success);display:none;}
+  .price-db-table .btn-save:hover{background:var(--success-dim);}
+  .price-db-table .btn-cancel{color:var(--panel-text-muted);display:none;}
+  .price-db-table .btn-cancel:hover{background:rgba(0,0,0,0.05);}
+  .price-db-table .btn-delete{color:var(--danger);opacity:0.5;}
+  .price-db-table .btn-delete:hover{opacity:1;background:var(--danger-dim);}
+  .price-db-table tr.editing .btn-edit{display:none;}
+  .price-db-table tr.editing .btn-save,.price-db-table tr.editing .btn-cancel{display:inline-block;}
+  .price-db-table tr.editing .price-value{display:none;}
+  .price-db-table tr.editing .price-input{display:inline-block;}
+  .price-db-table .price-input{display:none;}
+  .price-db-empty{
+    padding:40px 20px;
+    text-align:center;
+    color:var(--panel-text-muted);
+  }
+  .price-db-empty-icon{font-size:36px;margin-bottom:12px;opacity:0.4;}
+  .price-db-empty-title{font-weight:600;margin-bottom:4px;color:var(--panel-text);}
+  .price-db-empty-desc{font-size:13px;}
+
+  @media(max-width:768px){
+    .price-db{padding:16px;}
+    .price-db-header{flex-direction:column;}
+    .price-db-table th.col-unit,.price-db-table td.col-unit{display:none;}
+  }
+
+  /* ---- Modals (Phase 9) ---- */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;align-items:center;justify-content:center;
+    z-index:10000;
+    backdrop-filter:blur(2px);
+    padding:20px;
+  }
+  .modal-overlay.active{display:flex;}
+  .modal{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    width:100%;max-width:440px;
+    box-shadow:var(--shadow-lg);
+    overflow:hidden;
+  }
+  .modal-header{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:20px 24px 16px;
+    border-bottom:1px solid var(--border);
+  }
+  .modal-header h3{
+    font-family:var(--font-display);
+    font-size:18px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    margin:0;
+    color:var(--text);
+  }
+  .modal-close{
+    background:none;border:none;color:var(--text-muted);
+    font-size:20px;cursor:pointer;padding:4px 8px;
+    border-radius:var(--radius);transition:all var(--transition);
+    line-height:1;
+  }
+  .modal-close:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+  .modal-body{
+    padding:20px 24px;
+    font-family:var(--font-sans);
+    font-size:14px;
+    color:var(--text-muted);
+    line-height:1.6;
+  }
+  .modal-body p{margin:0 0 12px;}
+  .modal-body p:last-child{margin-bottom:0;}
+  .modal-footer{
+    display:flex;justify-content:flex-end;gap:8px;
+    padding:16px 24px 20px;
+    border-top:1px solid var(--border);
+  }
+  .modal-footer .btn.ghost{
+    border-color:var(--border);
+    color:var(--text-muted);
+  }
+  .modal-footer .btn.ghost:hover{
+    border-color:var(--text-muted);
+    color:var(--text);
+    background:rgba(255,255,255,0.04);
+  }
+  .modal-footer .btn.danger{
+    background:var(--danger);
+    color:#fff;
+  }
+  .modal-footer .btn.danger:hover{background:#dc2626;}
+
+  /* ---- Toast (Phase 9) ---- */
+  .toast{
+    position:fixed;bottom:24px;right:24px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:14px 20px;
+    font-family:var(--font-sans);
+    font-size:13px;
+    color:var(--text);
+    z-index:10001;
+    opacity:0;transform:translateY(12px);
+    transition:all .3s ease;
+    pointer-events:none;
+    box-shadow:var(--shadow-lg);
+    display:flex;align-items:center;gap:10px;
+    max-width:360px;
+  }
+  .toast.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+  .toast .toast-icon{font-size:16px;flex-shrink:0;}
+  .toast .toast-msg{flex:1;}
+  .toast.success{border-color:var(--success);background:var(--success-dim);}
+  .toast.success .toast-icon,.toast.success .toast-msg{color:var(--success);}
+  .toast.error{border-color:var(--danger);background:var(--danger-dim);}
+  .toast.error .toast-icon,.toast.error .toast-msg{color:var(--danger);}
+  .toast.warning{border-color:var(--warning);background:var(--warning-dim);}
+  .toast.warning .toast-icon,.toast.warning .toast-msg{color:var(--warning);}
+  .toast.info{border-color:var(--primary);background:var(--primary-dim);}
+  .toast.info .toast-icon,.toast.info .toast-msg{color:var(--primary);}
+
+  @media(max-width:480px){
+    .toast{left:16px;right:16px;bottom:16px;max-width:none;}
+  }
 </head>
 <body>
 <div class="spinner" id="spinner"></div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
 <div class="save-indicator" id="saveIndicator">Saving...</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="confirmTitle">Confirm</h3>
+      <button class="modal-close" onclick="closeConfirm()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMessage">Are you sure?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ghost" id="confirmCancel">Cancel</button>
+      <button class="btn" id="confirmOk">Confirm</button>
+    </div>
+  </div>
+</div>
 
 <div class="timeout-modal" id="timeoutModal">
   <div class="timeout-box">
@@ -2480,199 +2770,308 @@ function renderPanel(){
 
   if(activeTab === 'pricelist'){
     panel.style.gridTemplateColumns = '1fr';
-    const content = document.createElement('div');
-    content.innerHTML = `<h2>${m.title}</h2><div class="desc">${m.desc}</div>`;
+    panel.innerHTML = '';
     
     const allItems = [
-      {key:'Excavation: Excavated volume', unit:'cu.m.'},
-      {key:'Excavation: Backfill (return to site)', unit:'cu.m.'},
-      {key:'Excavation: Spoil to haul off', unit:'cu.m.'},
-      {key:'Concrete: Cement', unit:'bags (40kg)'},
-      {key:'Concrete: Sand', unit:'cu.m.'},
-      {key:'Concrete: Gravel', unit:'cu.m.'},
-      {key:'Concrete: Ties count', unit:'pcs'},
-      {key:'Concrete: Tie weight', unit:'kg'},
-      {key:'CHB Masonry: CHB (4")', unit:'pcs'},
-      {key:'CHB Masonry: CHB (6")', unit:'pcs'},
-      {key:'CHB Masonry: Mortar cement', unit:'bags (40kg)'},
-      {key:'CHB Masonry: Mortar sand', unit:'cu.m.'},
-      {key:'CHB Masonry: Horiz. bars (10mm)', unit:'pcs'},
-      {key:'CHB Masonry: Horiz. bars (12mm)', unit:'pcs'},
-      {key:'CHB Masonry: Vert. bars (10mm)', unit:'pcs'},
-      {key:'CHB Masonry: Vert. bars (12mm)', unit:'pcs'},
-      {key:'Plastering: Cement (12mm)', unit:'bags (40kg)'},
-      {key:'Plastering: Cement (16mm)', unit:'bags (40kg)'},
-      {key:'Plastering: Cement (20mm)', unit:'bags (40kg)'},
-      {key:'Plastering: Sand (12mm)', unit:'cu.m.'},
-      {key:'Plastering: Sand (16mm)', unit:'cu.m.'},
-      {key:'Plastering: Sand (20mm)', unit:'cu.m.'},
-      {key:'Plastering: Wire mesh / lath', unit:'sq.m.'},
-      {key:'Reinforcement: Bars (10mm × 6m ea.)', unit:'pcs'},
-      {key:'Reinforcement: Bars (12mm × 6m ea.)', unit:'pcs'},
-      {key:'Reinforcement: Bars (16mm × 6m ea.)', unit:'pcs'},
-      {key:'Reinforcement: Bars (20mm × 6m ea.)', unit:'pcs'},
-      {key:'Reinforcement: Bars (25mm × 6m ea.)', unit:'pcs'},
-      {key:'Reinforcement: Tie wire', unit:'kg'},
-      {key:'Reinforcement: Bottom bars', unit:'pcs'},
-      {key:'Reinforcement: Top bars', unit:'pcs'},
-      {key:'Reinforcement: Stirrups', unit:'pcs'},
-      {key:'Reinforcement: Main bars', unit:'pcs'},
-      {key:'Reinforcement: Ties', unit:'pcs'},
-      {key:'Reinforcement: Temp bars', unit:'pcs'},
-      {key:'Reinforcement: Dir. 1 bars', unit:'pcs'},
-      {key:'Reinforcement: Dir. 2 bars', unit:'pcs'},
-      {key:'Painting: Putty / filler', unit:'kg'},
-      {key:'Painting: Sandpaper', unit:'sheets'},
-      {key:'Painting: Masking tape', unit:'rolls'},
-      {key:'Painting: Primer', unit:'liters (4L pail)'},
-      {key:'Painting: Surfacer / filler', unit:'liters (4L pail)'},
-      {key:'Painting: Topcoat', unit:'liters (4L pail)'},
-      {key:'Painting: Thinner / solvent', unit:'liters'},
-      {key:'Tiling: Tiles needed', unit:'pcs'},
-      {key:'Tiling: Tile adhesive', unit:'kg'},
-      {key:'Tiling: Mortar cement', unit:'bags (40kg)'},
-      {key:'Tiling: Mortar sand', unit:'cu.m.'},
-      {key:'Tiling: White cement (grout)', unit:'kg'},
-      {key:'Tiling: Colored grout', unit:'kg'},
-      {key:'Tiling: Wall adhesive', unit:'kg'},
-      {key:'Tiling: Wall white cement', unit:'kg'},
-      {key:'Roofing: Roofing sheets', unit:'pcs'},
-      {key:'Roofing: Screws / rivets', unit:'pcs'},
-      {key:'Roofing: Ridge cap', unit:'m'},
-      {key:'Roofing: Purlins (weight)', unit:'kg'},
-      {key:'Roofing: Gutter', unit:'m'},
-      {key:'Roofing: Downspout', unit:'pcs'},
-      {key:'Doors/Windows: Door D-1 — count', unit:'pcs'},
-      {key:'Electrical: Lighting points', unit:'pcs'},
-      {key:'Electrical: Convenience outlets', unit:'pcs'},
-      {key:'Electrical: Switches', unit:'pcs'},
-      {key:'Electrical: Wire', unit:'m'},
-      {key:'Electrical: Conduit / pipe', unit:'m'},
-      {key:'Electrical: Junction boxes', unit:'pcs'},
-      {key:'Electrical: Switch boxes', unit:'pcs'},
-      {key:'Electrical: Outlet boxes', unit:'pcs'},
-      {key:'Electrical: Panel / breaker boxes', unit:'pcs'},
-      {key:'Electrical: Cable ties', unit:'pcs'},
-      {key:'Electrical: Electrical tape', unit:'m'},
-      {key:'Form/Scaffold: Plywood / phenolic board', unit:'sq.m.'},
-      {key:'Form/Scaffold: Wood studs / runners', unit:'running m'},
-      {key:'Form/Scaffold: Form ties', unit:'pcs'},
-      {key:'Form/Scaffold: Nails', unit:'kg'},
-      {key:'Lumber: Common lumber', unit:'pcs'},
-      {key:'Lumber: 2×2', unit:'pcs'},
-      {key:'Lumber: 2×3', unit:'pcs'},
-      {key:'Lumber: 2×4', unit:'pcs'},
-      {key:'Lumber: Plywood', unit:'pcs'},
-      {key:'Ceiling: Gypsum board', unit:'sq.m.'},
-      {key:'Ceiling: Cement board', unit:'sq.m.'},
-      {key:'Ceiling: Fiberglass board', unit:'sq.m.'},
-      {key:'Ceiling: Metal furring', unit:'running m'},
-      {key:'Ceiling: Hangers', unit:'pcs'},
-      {key:'Ceiling: Screws', unit:'pcs'},
-      {key:'Ceiling: Angle molding', unit:'m'},
-      {key:'Steel Works: Steel length', unit:'running m'},
-      {key:'Steel Works: Bolts', unit:'pcs'},
-      {key:'Steel Works: Steel plates', unit:'sq.m.'},
-      {key:'Steel Works: Welding rods', unit:'kg'},
-      {key:'Plumbing: Supply pipe (20mm)', unit:'m'},
-      {key:'Plumbing: Supply pipe (25mm)', unit:'m'},
-      {key:'Plumbing: Supply pipe (32mm)', unit:'m'},
-      {key:'Plumbing: Drain pipe (100mm)', unit:'m'},
-      {key:'Plumbing: Drain pipe (150mm)', unit:'m'},
-      {key:'Plumbing: Elbows', unit:'pcs'},
-      {key:'Plumbing: Tees', unit:'pcs'},
-      {key:'Plumbing: Couplings', unit:'pcs'},
-      {key:'Plumbing: Fixtures', unit:'pcs'},
-      {key:'Waterproofing: Roof membrane', unit:'sq.m.'},
-      {key:'Waterproofing: Wet area membrane', unit:'sq.m.'},
-      {key:'Waterproofing: Upstand membrane', unit:'sq.m.'},
-      {key:'Waterproofing: Roof primer', unit:'liters'},
-      {key:'Waterproofing: Wet area primer', unit:'liters'},
-      {key:'Waterproofing: Sealant', unit:'tubes'},
-      {key:'Form/Scaffold: Floor area', unit:'sq.m.'},
-      {key:'Form/Scaffold: Steel pipes', unit:'kg'},
-      {key:'Form/Scaffold: Couplers', unit:'pcs'},
-      {key:'Form/Scaffold: Posts', unit:'pcs'},
-      {key:'Form/Scaffold: Braces', unit:'pcs'},
+      {key:'Excavation: Excavated volume', unit:'cu.m.', cat:'Excavation'},
+      {key:'Excavation: Backfill (return to site)', unit:'cu.m.', cat:'Excavation'},
+      {key:'Excavation: Spoil to haul off', unit:'cu.m.', cat:'Excavation'},
+      {key:'Concrete: Cement', unit:'bags (40kg)', cat:'Concrete'},
+      {key:'Concrete: Sand', unit:'cu.m.', cat:'Concrete'},
+      {key:'Concrete: Gravel', unit:'cu.m.', cat:'Concrete'},
+      {key:'Concrete: Ties count', unit:'pcs', cat:'Concrete'},
+      {key:'Concrete: Tie weight', unit:'kg', cat:'Concrete'},
+      {key:'CHB Masonry: CHB (4")', unit:'pcs', cat:'CHB Masonry'},
+      {key:'CHB Masonry: CHB (6")', unit:'pcs', cat:'CHB Masonry'},
+      {key:'CHB Masonry: Mortar cement', unit:'bags (40kg)', cat:'CHB Masonry'},
+      {key:'CHB Masonry: Mortar sand', unit:'cu.m.', cat:'CHB Masonry'},
+      {key:'CHB Masonry: Horiz. bars (10mm)', unit:'pcs', cat:'CHB Masonry'},
+      {key:'CHB Masonry: Horiz. bars (12mm)', unit:'pcs', cat:'CHB Masonry'},
+      {key:'CHB Masonry: Vert. bars (10mm)', unit:'pcs', cat:'CHB Masonry'},
+      {key:'CHB Masonry: Vert. bars (12mm)', unit:'pcs', cat:'CHB Masonry'},
+      {key:'Plastering: Cement (12mm)', unit:'bags (40kg)', cat:'Plastering'},
+      {key:'Plastering: Cement (16mm)', unit:'bags (40kg)', cat:'Plastering'},
+      {key:'Plastering: Cement (20mm)', unit:'bags (40kg)', cat:'Plastering'},
+      {key:'Plastering: Sand (12mm)', unit:'cu.m.', cat:'Plastering'},
+      {key:'Plastering: Sand (16mm)', unit:'cu.m.', cat:'Plastering'},
+      {key:'Plastering: Sand (20mm)', unit:'cu.m.', cat:'Plastering'},
+      {key:'Plastering: Wire mesh / lath', unit:'sq.m.', cat:'Plastering'},
+      {key:'Reinforcement: Bars (10mm × 6m ea.)', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Bars (12mm × 6m ea.)', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Bars (16mm × 6m ea.)', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Bars (20mm × 6m ea.)', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Bars (25mm × 6m ea.)', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Tie wire', unit:'kg', cat:'Reinforcement'},
+      {key:'Reinforcement: Bottom bars', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Top bars', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Stirrups', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Main bars', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Ties', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Temp bars', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Dir. 1 bars', unit:'pcs', cat:'Reinforcement'},
+      {key:'Reinforcement: Dir. 2 bars', unit:'pcs', cat:'Reinforcement'},
+      {key:'Painting: Putty / filler', unit:'kg', cat:'Painting'},
+      {key:'Painting: Sandpaper', unit:'sheets', cat:'Painting'},
+      {key:'Painting: Masking tape', unit:'rolls', cat:'Painting'},
+      {key:'Painting: Primer', unit:'liters (4L pail)', cat:'Painting'},
+      {key:'Painting: Surfacer / filler', unit:'liters (4L pail)', cat:'Painting'},
+      {key:'Painting: Topcoat', unit:'liters (4L pail)', cat:'Painting'},
+      {key:'Painting: Thinner / solvent', unit:'liters', cat:'Painting'},
+      {key:'Tiling: Tiles needed', unit:'pcs', cat:'Tiling'},
+      {key:'Tiling: Tile adhesive', unit:'kg', cat:'Tiling'},
+      {key:'Tiling: Mortar cement', unit:'bags (40kg)', cat:'Tiling'},
+      {key:'Tiling: Mortar sand', unit:'cu.m.', cat:'Tiling'},
+      {key:'Tiling: White cement (grout)', unit:'kg', cat:'Tiling'},
+      {key:'Tiling: Colored grout', unit:'kg', cat:'Tiling'},
+      {key:'Tiling: Wall adhesive', unit:'kg', cat:'Tiling'},
+      {key:'Tiling: Wall white cement', unit:'kg', cat:'Tiling'},
+      {key:'Roofing: Roofing sheets', unit:'pcs', cat:'Roofing'},
+      {key:'Roofing: Screws / rivets', unit:'pcs', cat:'Roofing'},
+      {key:'Roofing: Ridge cap', unit:'m', cat:'Roofing'},
+      {key:'Roofing: Purlins (weight)', unit:'kg', cat:'Roofing'},
+      {key:'Roofing: Gutter', unit:'m', cat:'Roofing'},
+      {key:'Roofing: Downspout', unit:'pcs', cat:'Roofing'},
+      {key:'Doors/Windows: Door D-1 — count', unit:'pcs', cat:'Doors/Windows'},
+      {key:'Electrical: Lighting points', unit:'pcs', cat:'Electrical'},
+      {key:'Electrical: Convenience outlets', unit:'pcs', cat:'Electrical'},
+      {key:'Electrical: Switches', unit:'pcs', cat:'Electrical'},
+      {key:'Electrical: Wire', unit:'m', cat:'Electrical'},
+      {key:'Electrical: Conduit / pipe', unit:'m', cat:'Electrical'},
+      {key:'Electrical: Junction boxes', unit:'pcs', cat:'Electrical'},
+      {key:'Electrical: Switch boxes', unit:'pcs', cat:'Electrical'},
+      {key:'Electrical: Outlet boxes', unit:'pcs', cat:'Electrical'},
+      {key:'Electrical: Panel / breaker boxes', unit:'pcs', cat:'Electrical'},
+      {key:'Electrical: Cable ties', unit:'pcs', cat:'Electrical'},
+      {key:'Electrical: Electrical tape', unit:'m', cat:'Electrical'},
+      {key:'Form/Scaffold: Plywood / phenolic board', unit:'sq.m.', cat:'Form/Scaffold'},
+      {key:'Form/Scaffold: Wood studs / runners', unit:'running m', cat:'Form/Scaffold'},
+      {key:'Form/Scaffold: Form ties', unit:'pcs', cat:'Form/Scaffold'},
+      {key:'Form/Scaffold: Nails', unit:'kg', cat:'Form/Scaffold'},
+      {key:'Lumber: Common lumber', unit:'pcs', cat:'Lumber'},
+      {key:'Lumber: 2×2', unit:'pcs', cat:'Lumber'},
+      {key:'Lumber: 2×3', unit:'pcs', cat:'Lumber'},
+      {key:'Lumber: 2×4', unit:'pcs', cat:'Lumber'},
+      {key:'Lumber: Plywood', unit:'pcs', cat:'Lumber'},
+      {key:'Ceiling: Gypsum board', unit:'sq.m.', cat:'Ceiling'},
+      {key:'Ceiling: Cement board', unit:'sq.m.', cat:'Ceiling'},
+      {key:'Ceiling: Fiberglass board', unit:'sq.m.', cat:'Ceiling'},
+      {key:'Ceiling: Metal furring', unit:'running m', cat:'Ceiling'},
+      {key:'Ceiling: Hangers', unit:'pcs', cat:'Ceiling'},
+      {key:'Ceiling: Screws', unit:'pcs', cat:'Ceiling'},
+      {key:'Ceiling: Angle molding', unit:'m', cat:'Ceiling'},
+      {key:'Steel Works: Steel length', unit:'running m', cat:'Steel Works'},
+      {key:'Steel Works: Bolts', unit:'pcs', cat:'Steel Works'},
+      {key:'Steel Works: Steel plates', unit:'sq.m.', cat:'Steel Works'},
+      {key:'Steel Works: Welding rods', unit:'kg', cat:'Steel Works'},
+      {key:'Plumbing: Supply pipe (20mm)', unit:'m', cat:'Plumbing'},
+      {key:'Plumbing: Supply pipe (25mm)', unit:'m', cat:'Plumbing'},
+      {key:'Plumbing: Supply pipe (32mm)', unit:'m', cat:'Plumbing'},
+      {key:'Plumbing: Drain pipe (100mm)', unit:'m', cat:'Plumbing'},
+      {key:'Plumbing: Drain pipe (150mm)', unit:'m', cat:'Plumbing'},
+      {key:'Plumbing: Elbows', unit:'pcs', cat:'Plumbing'},
+      {key:'Plumbing: Tees', unit:'pcs', cat:'Plumbing'},
+      {key:'Plumbing: Couplings', unit:'pcs', cat:'Plumbing'},
+      {key:'Plumbing: Fixtures', unit:'pcs', cat:'Plumbing'},
+      {key:'Waterproofing: Roof membrane', unit:'sq.m.', cat:'Waterproofing'},
+      {key:'Waterproofing: Wet area membrane', unit:'sq.m.', cat:'Waterproofing'},
+      {key:'Waterproofing: Upstand membrane', unit:'sq.m.', cat:'Waterproofing'},
+      {key:'Waterproofing: Roof primer', unit:'liters', cat:'Waterproofing'},
+      {key:'Waterproofing: Wet area primer', unit:'liters', cat:'Waterproofing'},
+      {key:'Waterproofing: Sealant', unit:'tubes', cat:'Waterproofing'},
+      {key:'Form/Scaffold: Floor area', unit:'sq.m.', cat:'Form/Scaffold'},
+      {key:'Form/Scaffold: Steel pipes', unit:'kg', cat:'Form/Scaffold'},
+      {key:'Form/Scaffold: Couplers', unit:'pcs', cat:'Form/Scaffold'},
+      {key:'Form/Scaffold: Posts', unit:'pcs', cat:'Form/Scaffold'},
+      {key:'Form/Scaffold: Braces', unit:'pcs', cat:'Form/Scaffold'},
     ];
     
-    let html = `<div style="margin-bottom:12px;">
-      <button class="btn" id="addPriceItem" style="margin-right:8px;">+ Add Item</button>
-      <button class="btn ghost" id="resetPriceDB" style="border-color:#333;color:#333;">Reset All Prices</button>
-    </div>
-    <table style="width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:13px;">
-      <thead><tr>
-        <th style="text-align:left;padding:8px;border-bottom:2px solid #333;font-size:10px;text-transform:uppercase;">Item</th>
-        <th style="text-align:left;padding:8px;border-bottom:2px solid #333;font-size:10px;text-transform:uppercase;">Unit</th>
-        <th style="text-align:right;padding:8px;border-bottom:2px solid #333;font-size:10px;text-transform:uppercase;">Unit Cost (₱)</th>
-        <th style="padding:8px;border-bottom:2px solid #333;"></th>
-      </tr></thead><tbody>`;
+    let customItems = JSON.parse(localStorage.getItem('customPriceItems') || '[]');
     
-    allItems.forEach(item => {
-      const savedPrice = priceDB[item.key] || 0;
-      html += `<tr>
-        <td style="padding:6px 8px;border-bottom:1px solid #ddd;font-size:12px;">${item.key}</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #ddd;font-size:12px;">${item.unit}</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #ddd;"><input class="pl-price" data-key="${item.key}" type="number" step="any" value="${savedPrice}" style="width:120px;text-align:right;border:1px solid #ccc;padding:4px;font-family:'IBM Plex Mono',monospace;font-size:13px;"></td>
-        <td style="padding:6px 8px;border-bottom:1px solid #ddd;"><button class="pl-rm" style="background:none;border:none;color:#c00;cursor:pointer;font-size:16px;">×</button></td>
-      </tr>`;
-    });
-    
-    html += `</tbody></table>`;
-    content.innerHTML += html;
-    panel.appendChild(content);
-    
-    panel.querySelectorAll('.pl-price').forEach(input => {
-      input.addEventListener('input', (e) => {
-        const key = e.target.dataset.key;
-        priceDB[key] = parseFloat(e.target.value) || 0;
-        savePriceDB();
-        ledger.forEach(row => {
-          if(priceDB[row.item] > 0){
-            row.cost = priceDB[row.item];
-          }
+    function renderPriceDB(filter = ''){
+      const searchLower = filter.toLowerCase();
+      const filtered = searchLower 
+        ? allItems.filter(i => i.key.toLowerCase().includes(searchLower) || i.cat.toLowerCase().includes(searchLower))
+        : allItems;
+      
+      const pricedCount = allItems.filter(i => priceDB[i.key] > 0).length;
+      
+      let html = `
+        <div class="price-db">
+          <div class="price-db-header">
+            <div>
+              <h2>Price Database</h2>
+              <div class="desc">Set prices for materials. When you add to estimate, prices auto-fill from this list.</div>
+            </div>
+            <div class="price-db-actions">
+              <button class="btn" id="addPriceItem">+ Add Custom Item</button>
+              <button class="btn ghost" id="resetPriceDB">Reset All</button>
+            </div>
+          </div>
+          <div class="price-db-search">
+            <input type="text" id="priceSearch" placeholder="Search materials by name or category..." value="${filter}">
+          </div>
+          <div class="price-db-stats">
+            <span><b>${allItems.length + customItems.length}</b> materials</span>
+            <span><b>${pricedCount}</b> priced</span>
+            <span><b>${allItems.length + customItems.length - pricedCount}</b> unpriced</span>
+          </div>
+          <div class="price-db-table-wrap">
+            <table class="price-db-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Material</th>
+                  <th>Unit</th>
+                  <th class="col-price">Unit Price</th>
+                  <th class="col-actions"></th>
+                </tr>
+              </thead>
+              <tbody>`;
+      
+      // Group by category
+      const groups = {};
+      filtered.forEach(item => {
+        if(!groups[item.cat]) groups[item.cat] = [];
+        groups[item.cat].push(item);
+      });
+      
+      Object.keys(groups).forEach(cat => {
+        html += `<tr class="category-header"><td colspan="5">${cat}</td></tr>`;
+        groups[cat].forEach(item => {
+          const price = priceDB[item.key] || 0;
+          const priceClass = price > 0 ? 'has-price' : 'no-price';
+          const priceDisplay = price > 0 ? '₱ ' + fmt(price) : '—';
+          html += `
+            <tr data-key="${item.key}">
+              <td class="col-category">${item.cat}</td>
+              <td class="col-material">${item.key.split(':')[1].trim()}</td>
+              <td class="col-unit">${item.unit}</td>
+              <td class="col-price">
+                <span class="price-value ${priceClass}">${priceDisplay}</span>
+                <input class="price-input" type="number" step="any" value="${price}" data-key="${item.key}">
+              </td>
+              <td class="col-actions">
+                <button class="btn-edit" title="Edit">Edit</button>
+                <button class="btn-save" title="Save">Save</button>
+                <button class="btn-cancel" title="Cancel">Cancel</button>
+              </td>
+            </tr>`;
         });
-        renderLedger();
       });
-    });
+      
+      // Custom items
+      customItems.forEach((item, idx) => {
+        const price = priceDB[item.key] || 0;
+        const priceClass = price > 0 ? 'has-price' : 'no-price';
+        const priceDisplay = price > 0 ? '₱ ' + fmt(price) : '—';
+        html += `
+          <tr data-key="${item.key}" data-custom="${idx}">
+            <td class="col-category">Custom</td>
+            <td class="col-material"><input class="material-name-input" type="text" value="${item.key.split(':')[1]?.trim() || item.key}" style="width:200px;border:1px solid var(--panel-input-border);border-radius:var(--radius);padding:4px 8px;font-family:var(--font-mono);font-size:12px;background:var(--panel-input-bg);color:var(--panel-text);"></td>
+            <td class="col-unit"><input class="unit-input" type="text" value="${item.unit}" style="width:80px;border:1px solid var(--panel-input-border);border-radius:var(--radius);padding:4px 8px;font-family:var(--font-mono);font-size:12px;background:var(--panel-input-bg);color:var(--panel-text);"></td>
+            <td class="col-price">
+              <span class="price-value ${priceClass}">${priceDisplay}</span>
+              <input class="price-input" type="number" step="any" value="${price}" data-key="${item.key}">
+            </td>
+            <td class="col-actions">
+              <button class="btn-edit" title="Edit">Edit</button>
+              <button class="btn-save" title="Save">Save</button>
+              <button class="btn-cancel" title="Cancel">Cancel</button>
+              <button class="btn-delete" title="Delete" data-idx="${idx}">×</button>
+            </td>
+          </tr>`;
+      });
+      
+      html += `</tbody></table></div></div>`;
+      panel.innerHTML = html;
+      
+      // Event listeners
+      panel.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.onclick = () => {
+          const tr = btn.closest('tr');
+          tr.classList.add('editing');
+          tr.querySelector('.price-input').focus();
+        };
+      });
+      
+      panel.querySelectorAll('.btn-cancel').forEach(btn => {
+        btn.onclick = () => {
+          const tr = btn.closest('tr');
+          tr.classList.remove('editing');
+          const input = tr.querySelector('.price-input');
+          const key = input.dataset.key;
+          input.value = priceDB[key] || 0;
+        };
+      });
+      
+      panel.querySelectorAll('.btn-save').forEach(btn => {
+        btn.onclick = () => {
+          const tr = btn.closest('tr');
+          const input = tr.querySelector('.price-input');
+          const key = input.dataset.key;
+          const newPrice = parseFloat(input.value) || 0;
+          priceDB[key] = newPrice;
+          savePriceDB();
+          
+          // Update display
+          tr.classList.remove('editing');
+          const priceEl = tr.querySelector('.price-value');
+          priceEl.textContent = newPrice > 0 ? '₱ ' + fmt(newPrice) : '—';
+          priceEl.className = 'price-value ' + (newPrice > 0 ? 'has-price' : 'no-price');
+          
+          // Update ledger
+          ledger.forEach(row => {
+            if(priceDB[row.item] > 0){
+              row.cost = priceDB[row.item];
+            }
+          });
+          renderLedger();
+          showToast('Price updated', 'success');
+          
+          // Update stats
+          const pricedCount = allItems.filter(i => priceDB[i.key] > 0).length;
+          panel.querySelectorAll('.price-db-stats span b')[1].textContent = pricedCount;
+          panel.querySelectorAll('.price-db-stats span b')[2].textContent = allItems.length + customItems.length - pricedCount;
+        };
+      });
+      
+      panel.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.onclick = () => {
+          const idx = parseInt(btn.dataset.idx);
+          const item = customItems[idx];
+          delete priceDB[item.key];
+          savePriceDB();
+          customItems.splice(idx, 1);
+          localStorage.setItem('customPriceItems', JSON.stringify(customItems));
+          renderPriceDB(filter);
+          showToast('Item deleted', 'info');
+        };
+      });
+      
+      panel.querySelector('#priceSearch').addEventListener('input', (e) => {
+        renderPriceDB(e.target.value);
+        panel.querySelector('#priceSearch').focus();
+      });
+      
+      panel.querySelector('#addPriceItem').onclick = () => {
+        const newItem = {key:'Custom: New Item', unit:'pcs', cat:'Custom'};
+        customItems.push(newItem);
+        localStorage.setItem('customPriceItems', JSON.stringify(customItems));
+        renderPriceDB(filter);
+        showToast('Custom item added', 'info');
+      };
+      
+      panel.querySelector('#resetPriceDB').onclick = () => {
+        showConfirm('Reset All Prices', 'Clear all prices? This cannot be undone.', () => {
+          priceDB = {};
+          savePriceDB();
+          renderPriceDB(filter);
+          showToast('All prices cleared', 'warning');
+        });
+      };
+    }
     
-    panel.querySelectorAll('.pl-rm').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.target.closest('tr').remove();
-      });
-    });
-    
-    document.getElementById('addPriceItem').onclick = () => {
-      const tbody = panel.querySelector('tbody');
-      const tr = document.createElement('tr');
-      const newItem = 'Custom: New Item';
-      tr.innerHTML = `
-        <td style="padding:6px 8px;border-bottom:1px solid #ddd;"><input class="pl-key" value="${newItem}" style="width:250px;border:1px solid #ccc;padding:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;"></td>
-        <td style="padding:6px 8px;border-bottom:1px solid #ddd;"><input class="pl-unit" value="pcs" style="width:80px;border:1px solid #ccc;padding:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;"></td>
-        <td style="padding:6px 8px;border-bottom:1px solid #ddd;"><input class="pl-price" data-key="${newItem}" type="number" step="any" value="0" style="width:120px;text-align:right;border:1px solid #ccc;padding:4px;font-family:'IBM Plex Mono',monospace;font-size:13px;"></td>
-        <td style="padding:6px 8px;border-bottom:1px solid #ddd;"><button class="pl-rm" style="background:none;border:none;color:#c00;cursor:pointer;font-size:16px;">×</button></td>
-      `;
-      tbody.appendChild(tr);
-      tr.querySelector('.pl-key').addEventListener('change', (e) => {
-        tr.querySelector('.pl-price').dataset.key = e.target.value;
-      });
-      tr.querySelector('.pl-price').addEventListener('input', (e) => {
-        priceDB[e.target.dataset.key] = parseFloat(e.target.value) || 0;
-        savePriceDB();
-      });
-      tr.querySelector('.pl-rm').addEventListener('click', (e) => {
-        e.target.closest('tr').remove();
-      });
-    };
-    
-    document.getElementById('resetPriceDB').onclick = () => {
-      if(confirm('Clear all prices?')){
-        priceDB = {};
-        savePriceDB();
-        renderPanel();
-      }
-    };
-    
+    renderPriceDB();
     return;
   }
 
@@ -2782,13 +3181,13 @@ function renderPanel(){
           btn.onclick = () => {
             const uid = btn.dataset.uid;
             const name = btn.dataset.name;
-            if(confirm(`Delete all data for "${name}"? This cannot be undone.`)){
+            showConfirm('Delete User', `Delete all data for "${name}"? This cannot be undone.`, () => {
               db.collection('users').doc(uid).delete().then(() => {
                 usersData = usersData.filter(u => u.id !== uid);
                 showToast('User deleted', 'error');
                 renderAdminTable(adminContent.querySelector('#adminSearch').value);
               });
-            }
+            });
           };
         });
         
@@ -2798,7 +3197,7 @@ function renderPanel(){
             (u.displayName||'').toLowerCase().includes(filter.toLowerCase()) ||
             (u.email||'').toLowerCase().includes(filter.toLowerCase())
           ) : usersData;
-          if(confirm(`Activate ${filtered.length} users?`)){
+          showConfirm('Bulk Activate', `Activate ${filtered.length} users?`, () => {
             const batch = db.batch();
             filtered.forEach(u => {
               if(u.active !== true){
@@ -2810,7 +3209,7 @@ function renderPanel(){
               showToast(`${filtered.length} users activated`);
               renderAdminTable(filter);
             });
-          }
+          });
         };
         
         adminContent.querySelector('.bulk-deactivate-btn').onclick = () => {
@@ -2819,7 +3218,7 @@ function renderPanel(){
             (u.displayName||'').toLowerCase().includes(filter.toLowerCase()) ||
             (u.email||'').toLowerCase().includes(filter.toLowerCase())
           ) : usersData;
-          if(confirm(`Deactivate ${filtered.length} users?`)){
+          showConfirm('Bulk Deactivate', `Deactivate ${filtered.length} users?`, () => {
             const batch = db.batch();
             filtered.forEach(u => {
               if(u.active === true){
@@ -2831,7 +3230,7 @@ function renderPanel(){
               showToast(`${filtered.length} users deactivated`, 'error');
               renderAdminTable(filter);
             });
-          }
+          });
         };
       }
       
@@ -3218,10 +3617,11 @@ function updateEstimateTotal(){
 
 function clearLedger(){
   if(ledger.length === 0) return;
-  if(confirm('Clear the entire estimate?')){
+  showConfirm('Clear Estimate', 'Clear the entire estimate? This cannot be undone.', () => {
     ledger = [];
     renderLedger();
-  }
+    showToast('Estimate cleared', 'info');
+  });
 }
 
 /* ---------------- export PDF ---------------- */
@@ -3460,11 +3860,48 @@ const timeoutModal = document.getElementById('timeoutModal');
 let projectInfo = {};
 
 /* ---- Toast ---- */
+const toastIcons = {
+  success: '✓',
+  error: '✕',
+  warning: '⚠',
+  info: 'ℹ'
+};
+
 function showToast(msg, type='success'){
-  toastEl.textContent = msg;
+  const iconEl = toastEl.querySelector('.toast-icon');
+  const msgEl = toastEl.querySelector('.toast-msg');
+  iconEl.textContent = toastIcons[type] || toastIcons.success;
+  msgEl.textContent = msg;
   toastEl.className = 'toast ' + type + ' show';
-  setTimeout(()=>{ toastEl.className = 'toast'; }, 3000);
+  clearTimeout(toastEl._timer);
+  toastEl._timer = setTimeout(()=>{ toastEl.className = 'toast'; }, 3000);
 }
+
+/* ---- Confirm Modal ---- */
+let confirmCallback = null;
+
+function showConfirm(title, message, onConfirm){
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMessage').textContent = message;
+  document.getElementById('confirmModal').classList.add('active');
+  confirmCallback = onConfirm;
+}
+
+function closeConfirm(){
+  document.getElementById('confirmModal').classList.remove('active');
+  confirmCallback = null;
+}
+
+document.getElementById('confirmOk').onclick = () => {
+  if(confirmCallback) confirmCallback();
+  closeConfirm();
+};
+
+document.getElementById('confirmCancel').onclick = closeConfirm;
+
+document.getElementById('confirmModal').onclick = (e) => {
+  if(e.target === document.getElementById('confirmModal')) closeConfirm();
+};
 
 /* ---- Spinner ---- */
 function showSpinner(){ spinner.classList.add('active'); }
@@ -3574,9 +4011,9 @@ function showUserInfo(user, isAdmin){
     <button class="logout-btn" id="logoutBtn">Sign Out</button>
   `;
   document.getElementById('logoutBtn').onclick = () => {
-    if(confirm('Are you sure you want to sign out?')){
+    showConfirm('Sign Out', 'Are you sure you want to sign out?', () => {
       auth.signOut();
-    }
+    });
   };
   document.getElementById('editProjectBtn').onclick = () => {
     document.getElementById('projTitle').value = projectInfo.title || '';
@@ -3587,7 +4024,7 @@ function showUserInfo(user, isAdmin){
     mainApp.style.display = 'none';
   };
   document.getElementById('newProjectBtn').onclick = () => {
-    if(confirm('Start a new project? Current project data will be saved.')){
+    showConfirm('New Project', 'Start a new project? Current project data will be saved.', () => {
       projectInfo = {};
       document.getElementById('projTitle').value = '';
       document.getElementById('projLocation').value = '';
@@ -3597,7 +4034,7 @@ function showUserInfo(user, isAdmin){
       ledgerIdSeq = 0;
       projectOverlay.style.display = 'flex';
       mainApp.style.display = 'none';
-    }
+    });
   };
   if(isAdmin) adminTab.style.display = 'block';
   updateHeader();
