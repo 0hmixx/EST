@@ -1887,11 +1887,16 @@ function createNavItem(key, icon){
   return b;
 }
 
+let adminTab;
+
 Object.values(navCategories).forEach(cat=>{
   cat.buttons = [];
   cat.items.forEach(item=>{
     const btn = createNavItem(item.key, item.icon);
-    if(item.adminOnly) btn.id = 'adminNavBtn';
+    if(item.adminOnly){
+      btn.id = 'adminNavBtn';
+      adminTab = btn;
+    }
     cat.el.appendChild(btn);
     cat.buttons.push(btn);
   });
