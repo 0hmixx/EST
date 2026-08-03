@@ -980,17 +980,139 @@
     background:rgba(255,255,255,0.04);
   }
 
+  /* BOQ search/filter bar */
+  .estimate-toolbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 24px;
+    border-bottom:1px solid var(--border);
+    background:var(--surface-2);
+    flex-wrap:wrap;
+  }
+  .estimate-search{
+    flex:1;
+    min-width:200px;
+    position:relative;
+  }
+  .estimate-search input{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    color:var(--text);
+    font-family:var(--font-sans);
+    font-size:13px;
+    padding:8px 12px 8px 34px;
+    transition:border-color var(--transition);
+  }
+  .estimate-search input::placeholder{color:var(--text-dim);}
+  .estimate-search input:focus{outline:none;border-color:var(--primary);}
+  .estimate-search::before{
+    content:"🔍";
+    position:absolute;
+    left:10px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:13px;
+    opacity:0.4;
+  }
+  .estimate-filter-info{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .estimate-toolbar-actions{
+    display:flex;
+    gap:6px;
+  }
+
+  /* Category subtotal row */
+  .estimate-table tr.subtotal-row td{
+    padding:8px 12px;
+    font-weight:600;
+    font-size:12px;
+    text-align:right;
+    color:var(--primary);
+    border-bottom:2px solid var(--border);
+    background:rgba(59,130,246,0.04);
+  }
+  .estimate-table tr.subtotal-row td:first-child{
+    text-align:left;
+    color:var(--text-muted);
+  }
+  .estimate-table tr.subtotal-row .subtotal-label{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    margin-right:8px;
+  }
+
+  /* Grand total row */
+  .estimate-table tr.grandtotal-row td{
+    padding:12px;
+    font-weight:700;
+    font-size:14px;
+    text-align:right;
+    color:var(--text);
+    border-top:2px solid var(--primary);
+    background:var(--primary-dim);
+  }
+  .estimate-table tr.grandtotal-row td:first-child{
+    text-align:left;
+  }
+
+  /* Sortable headers */
+  .estimate-table th.sortable{
+    cursor:pointer;
+    user-select:none;
+    position:relative;
+    padding-right:20px;
+  }
+  .estimate-table th.sortable:hover{
+    color:var(--primary);
+  }
+  .estimate-table th.sortable::after{
+    content:"";
+    position:absolute;
+    right:6px;
+    top:50%;
+    transform:translateY(-50%);
+    width:0;
+    height:0;
+    border-left:4px solid transparent;
+    border-right:4px solid transparent;
+    border-top:4px solid var(--text-dim);
+    opacity:0.4;
+  }
+  .estimate-table th.sort-asc::after{
+    border-top:none;
+    border-bottom:4px solid var(--primary);
+    opacity:1;
+  }
+  .estimate-table th.sort-desc::after{
+    border-top:4px solid var(--primary);
+    opacity:1;
+  }
+
+  /* Row hover highlight */
+  .estimate-table tbody tr.data-row:hover{
+    background:rgba(255,255,255,0.03);
+  }
+
   /* Responsive */
   @media(max-width:768px){
     .estimate-header{padding:16px;}
     .estimate-header-left{flex-direction:column;gap:4px;}
     .estimate-header-right{text-align:left;}
     .estimate-total-value{font-size:22px;}
+    .estimate-toolbar{padding:10px 16px;}
+    .estimate-footer{padding:12px 16px;}
     .estimate-table th.col-category,
     .estimate-table td.col-category{
       display:none;
     }
-    .estimate-footer{padding:12px 16px;}
   }
   @media(max-width:480px){
     .estimate-table th.col-unit,
@@ -1722,6 +1844,10 @@
       <div class="sidebar-bottom">
         <div class="nav-category-header" style="padding:8px 8px 6px;">Project</div>
         <div class="nav-items" id="navProject"></div>
+        <div style="padding:8px;display:flex;flex-direction:column;gap:4px;">
+          <button class="btn ghost small" onclick="backupProject()" style="width:100%;font-size:11px;">Backup Project</button>
+          <button class="btn ghost small" onclick="restoreProject()" style="width:100%;font-size:11px;">Restore Project</button>
+        </div>
       </div>
     </div>
     <div>
@@ -1769,20 +1895,42 @@
         <div class="estimate-empty" id="ledgerEmpty">
           <div class="estimate-empty-icon">📊</div>
           <div class="estimate-empty-title">Your estimate is empty</div>
-          <div class="estimate-empty-desc">Calculate quantities from any takeoff module and add the results to your Master BOQ.</div>
-          <button class="btn" onclick="document.querySelector('.nav-item[data-key=excavation]').click()">Start a Calculation</button>
+          <div class="estimate-empty-desc">Start building your construction estimate by using a calculator module. Calculate quantities, then click "Add to Estimate" to populate this Bill of Quantities.</div>
+          <div style="margin-top:12px;">
+            <button class="btn" onclick="document.querySelector('.nav-item[data-key=excavation]').click()">Open Excavation Calculator</button>
+          </div>
+          <div style="margin-top:20px;font-size:12px;color:var(--text-dim);line-height:1.8;text-align:left;max-width:400px;margin-left:auto;margin-right:auto;">
+            <div style="font-weight:600;margin-bottom:6px;color:var(--text-muted);">Quick Start Guide</div>
+            <div>1. Select a module from the sidebar</div>
+            <div>2. Enter your project dimensions</div>
+            <div>3. Click "Calculate" to see results</div>
+            <div>4. Click "+ Add to Estimate" to add items here</div>
+            <div>5. Set unit prices in the Price Database</div>
+            <div>6. Export as PDF or Excel when ready</div>
+          </div>
+        </div>
+        
+        <div class="estimate-toolbar" id="estimateToolbar" style="display:none;">
+          <div class="estimate-search">
+            <input type="text" id="boqSearch" placeholder="Search items, categories...">
+          </div>
+          <div class="estimate-filter-info" id="filterInfo"></div>
+          <div class="estimate-toolbar-actions">
+            <button class="btn ghost small" onclick="openCustomItemModal()">+ Add Item</button>
+            <button class="btn ghost small" onclick="clearLedger()">Clear All</button>
+          </div>
         </div>
         
         <div class="estimate-table-wrap" id="estimateTableWrap">
           <table class="estimate-table">
             <thead>
               <tr>
-                <th class="col-category">Category</th>
-                <th class="col-item">Item</th>
-                <th class="col-qty">Qty</th>
+                <th class="col-category sortable" data-sort="category">Category</th>
+                <th class="col-item sortable" data-sort="item">Item</th>
+                <th class="col-qty sortable" data-sort="qty">Qty</th>
                 <th class="col-unit">Unit</th>
-                <th class="col-cost">Unit Cost</th>
-                <th class="col-amount">Amount</th>
+                <th class="col-cost sortable" data-sort="cost">Unit Cost</th>
+                <th class="col-amount sortable" data-sort="amount">Amount</th>
                 <th class="col-action"></th>
               </tr>
             </thead>
@@ -1793,8 +1941,6 @@
         <div class="estimate-footer">
           <div class="estimate-footer-hint">Edit unit costs to price out each line.</div>
           <div class="estimate-footer-actions">
-            <button class="btn ghost" onclick="openCustomItemModal()">+ Add Item</button>
-            <button class="btn ghost" onclick="clearLedger()">Clear All</button>
             <button class="btn ghost" onclick="previewPDF()">Preview</button>
             <button class="btn ghost" onclick="exportPDF()">Export PDF</button>
             <button class="btn ghost" onclick="exportExcel()">Export Excel</button>
@@ -1831,47 +1977,6 @@ function getPrice(itemName){
 
 function savePriceDB(){
   localStorage.setItem('priceDB', JSON.stringify(priceDB));
-}
-
-function matchPriceToItem(itemName){
-  const lower = itemName.toLowerCase();
-  const keywords = {
-    'cement': 'cement',
-    'sand': 'sand',
-    'gravel': 'gravel',
-    'chb': 'chb4',
-    'rebar': 'rebar12',
-    'tie wire': 'tieWire',
-    'plywood': 'plywood',
-    'adhesive': 'adhesive',
-    'white cement': 'whiteCement',
-    'putty': 'putty',
-    'primer': 'primer',
-    'topcoat': 'topcoat',
-    'thinner': 'thinner',
-    'wire': 'wire',
-    'conduit': 'conduit',
-    'junction box': 'jbox',
-    'switch box': 'sbox',
-    'outlet box': 'obox',
-    'cable tie': 'cableTie',
-    'electrical tape': 'elecTape',
-    'roofing sheet': 'roofSheet',
-    'ridge cap': 'ridgeCap',
-    'screws': 'screws',
-    'gutter': 'gutter',
-    'sandpaper': 'sandpaper',
-    'masking tape': 'maskingTape',
-    'nails': 'nails',
-    'lumber': 'lumber',
-  };
-  for(let keyword in keywords){
-    if(lower.includes(keyword)){
-      const key = keywords[keyword];
-      if(priceDB[key] > 0) return priceDB[key];
-    }
-  }
-  return getPrice(itemName);
 }
 
 const modules = {
@@ -1978,7 +2083,8 @@ const modules = {
         const mainBarLen = colH * rw;
         const mainWeight = mainBarLen * v.colMainCount * kgPerM_main;
         const tiePerimeter = 2*((b - 2*c.colConcCover) + (d - 2*c.colConcCover))/1000 + 24*v.colTieDia/1000;
-        const tieCount = Math.ceil(colH*1000/v.colTieSpacing) + 1;
+        const colTieSpacing = v.colTieSpacing > 0 ? v.colTieSpacing : 100;
+        const tieCount = Math.ceil(colH*1000/colTieSpacing) + 1;
         const tieWeight = tieCount * tiePerimeter * kgPerM_tie;
         const totalRebarWeight = mainWeight + tieWeight;
         results.push(
@@ -2029,22 +2135,27 @@ const modules = {
       const rw = 1 + c.rebarWastePct/100;
       const kgPerM_h = (v.horizDia*v.horizDia)/162;
       const kgPerM_v = (v.vertDia*v.vertDia)/162;
+      const stockLen = 6;
       const horizRows = Math.ceil(v.hgt/v.horizSpacing) + 1;
-      const horizBars = horizRows * Math.ceil(v.len/v.vertSpacing + 1);
-      const horizLen = v.len * rw;
-      const horizWeight = horizBars * horizLen * kgPerM_h;
-      const vertBars = Math.ceil(v.len/v.vertSpacing) + 1;
-      const vertLen = v.hgt * rw;
-      const vertWeight = vertBars * vertLen * kgPerM_v;
+      const horizBarsPerRow = Math.ceil(v.len/v.vertSpacing) + 1;
+      const horizTotalLen = horizRows * horizBarsPerRow * v.len * rw;
+      const horizPcs = Math.ceil(horizTotalLen / stockLen);
+      const horizWeight = horizTotalLen * kgPerM_h;
+      const vertBarsPerRow = Math.ceil(v.len/v.vertSpacing) + 1;
+      const vertTotalLen = vertBarsPerRow * v.hgt * rw;
+      const vertPcs = Math.ceil(vertTotalLen / stockLen);
+      const vertWeight = vertTotalLen * kgPerM_v;
       const totalRebarWeight = horizWeight + vertWeight;
       return [
         {item:'Wall area', qty:area, unit:'sq.m.', hidden:true},
         {item:`CHB (${v.thk}")`, qty:pcs, unit:'pcs'},
         {item:'Mortar cement', qty:cement, unit:'bags (40kg)'},
         {item:'Mortar sand', qty:sand, unit:'cu.m.'},
-        {item:`Horiz. bars (${v.horizDia}mm)`, qty:horizBars, unit:'pcs'},
+        {item:`Horiz. bars (${v.horizDia}mm × ${stockLen}m ea.)`, qty:horizPcs, unit:'pcs'},
+        {item:'Horizontal bars total length', qty:horizTotalLen, unit:'running m', hidden:true},
         {item:'Horizontal bars weight', qty:horizWeight, unit:'kg', hidden:true},
-        {item:`Vert. bars (${v.vertDia}mm)`, qty:vertBars, unit:'pcs'},
+        {item:`Vert. bars (${v.vertDia}mm × ${stockLen}m ea.)`, qty:vertPcs, unit:'pcs'},
+        {item:'Vertical bars total length', qty:vertTotalLen, unit:'running m', hidden:true},
         {item:'Vertical bars weight', qty:vertWeight, unit:'kg', hidden:true},
         {item:'Total rebar weight', qty:totalRebarWeight, unit:'kg'},
       ];
@@ -2173,14 +2284,15 @@ const modules = {
     ],
     compute(v,c){
       const waste = 1 + c.wastePct/100;
+      const stockLen = (v.stockLen > 0) ? v.stockLen : 6;
       if(v.type==='bar'){
         const lenNeeded = v.totalLen*waste;
         const kgPerM = (v.dia*v.dia)/162;
         const weight = lenNeeded*kgPerM;
-        const bars = Math.ceil(lenNeeded/v.stockLen);
+        const bars = Math.ceil(lenNeeded/stockLen);
         const tieWire = weight * c.tieWirePerKg;
         return [
-          {item:`Bars (${v.dia}mm × ${v.stockLen}m ea.)`, qty:bars, unit:'pcs'},
+          {item:`Bars (${v.dia}mm × ${stockLen}m ea.)`, qty:bars, unit:'pcs'},
           {item:'Total steel weight', qty:weight, unit:'kg'},
           {item:'Tie wire', qty:tieWire, unit:'kg'},
         ];
@@ -2192,18 +2304,16 @@ const modules = {
         const kgPerM_stir = (v.stirrupDia*v.stirrupDia)/162;
         const botWeight = barLen * v.botCount * kgPerM_bot;
         const topWeight = barLen * v.topCount * kgPerM_top;
-        const stirrupCount = Math.ceil(v.span*1000/v.stirrupSpacing) + 1;
+        const stirrupSpacing = v.stirrupSpacing > 0 ? v.stirrupSpacing : 100;
+        const stirrupCount = Math.ceil(v.span*1000/stirrupSpacing) + 1;
         const stirrupPerimeter = 2*((v.b - 2*c.concreteCover) + (v.h - 2*c.concreteCover))/1000 + 24*v.stirrupDia/1000;
         const stirrupWeight = stirrupCount * stirrupPerimeter * kgPerM_stir;
         const totalWeight = botWeight + topWeight + stirrupWeight;
-        const botBars = Math.ceil(v.span / v.stockLen || 1) * v.botCount;
-        const topBars = Math.ceil(v.span / v.stockLen || 1) * v.topCount;
-        const stockLen = document.querySelector('#f_stockLen') ? parseFloat(document.querySelector('#f_stockLen').value) : 6;
         const botBarCount = Math.ceil((v.span*waste) / stockLen) * v.botCount;
         const topBarCount = Math.ceil((v.span*waste) / stockLen) * v.topCount;
         return [
-          {item:'Bottom bars', qty:botBarCount, unit:'pcs'},
-          {item:'Top bars', qty:topBarCount, unit:'pcs'},
+          {item:`Bottom bars (${v.botDia}mm × ${stockLen}m ea.)`, qty:botBarCount, unit:'pcs'},
+          {item:`Top bars (${v.topDia}mm × ${stockLen}m ea.)`, qty:topBarCount, unit:'pcs'},
           {item:'Stirrups', qty:stirrupCount, unit:'pcs'},
           {item:'Total beam rebar weight', qty:totalWeight, unit:'kg'},
           {item:'Tie wire', qty:totalWeight*c.tieWirePerKg, unit:'kg'},
@@ -2218,16 +2328,17 @@ const modules = {
         const lowerZone = v.colH * 0.3;
         const upperZone = v.colH * 0.3;
         const midZone = v.colH - lowerZone - upperZone;
-        const tiesLower = Math.ceil(lowerZone*1000/v.tieSpacing) + 1;
-        const tiesUpper = Math.ceil(upperZone*1000/v.tieSpacingUpper) + 1;
+        const tieSpacing = v.tieSpacing > 0 ? v.tieSpacing : 100;
+        const tieSpacingUpper = v.tieSpacingUpper > 0 ? v.tieSpacingUpper : 100;
+        const tiesLower = Math.ceil(lowerZone*1000/tieSpacing) + 1;
+        const tiesUpper = Math.ceil(upperZone*1000/tieSpacingUpper) + 1;
         const tiesMid = midZone > 0 ? Math.ceil(midZone*1000/200) + 1 : 0;
         const totalTies = tiesLower + tiesUpper + tiesMid;
         const tieWeight = totalTies * tiePerimeter * kgPerM_tie;
         const totalWeight = mainWeight + tieWeight;
-        const stockLen = document.querySelector('#f_stockLen') ? parseFloat(document.querySelector('#f_stockLen').value) : 6;
         const mainBarCount = Math.ceil((v.colH*waste) / stockLen) * v.mainCount;
         return [
-          {item:'Main bars', qty:mainBarCount, unit:'pcs'},
+          {item:`Main bars (${v.mainDia}mm × ${stockLen}m ea.)`, qty:mainBarCount, unit:'pcs'},
           {item:'Ties', qty:totalTies, unit:'pcs'},
           {item:'Total column rebar weight', qty:totalWeight, unit:'kg'},
           {item:'Tie wire', qty:totalWeight*c.tieWirePerKg, unit:'kg'},
@@ -2236,16 +2347,22 @@ const modules = {
       if(v.type==='slab'){
         const kgPerM_main = (v.mainDia*v.mainDia)/162;
         const kgPerM_temp = (v.tempDia*v.tempDia)/162;
-        const mainBars = Math.ceil(v.slabWid*1000/v.mainSpacing) + 1;
-        const mainBarLen = v.slabLen * waste;
-        const mainWeight = mainBars * mainBarLen * kgPerM_main;
-        const tempBars = Math.ceil(v.slabLen*1000/v.tempSpacing) + 1;
-        const tempBarLen = v.slabWid * waste;
-        const tempWeight = tempBars * tempBarLen * kgPerM_temp;
+        const mainSpacing = v.mainSpacing > 0 ? v.mainSpacing : 100;
+        const tempSpacing = v.tempSpacing > 0 ? v.tempSpacing : 100;
+        const mainBars = Math.ceil(v.slabWid*1000/mainSpacing) + 1;
+        const mainTotalLen = mainBars * v.slabLen * waste;
+        const mainPcs = Math.ceil(mainTotalLen / stockLen);
+        const mainWeight = mainTotalLen * kgPerM_main;
+        const tempBars = Math.ceil(v.slabLen*1000/tempSpacing) + 1;
+        const tempTotalLen = tempBars * v.slabWid * waste;
+        const tempPcs = Math.ceil(tempTotalLen / stockLen);
+        const tempWeight = tempTotalLen * kgPerM_temp;
         const totalWeight = mainWeight + tempWeight;
         return [
-          {item:'Main bars', qty:mainBars, unit:'pcs'},
-          {item:'Temp bars', qty:tempBars, unit:'pcs'},
+          {item:`Main bars (${v.mainDia}mm × ${stockLen}m ea.)`, qty:mainPcs, unit:'pcs'},
+          {item:'Main bars total length', qty:mainTotalLen, unit:'running m', hidden:true},
+          {item:`Temp bars (${v.tempDia}mm × ${stockLen}m ea.)`, qty:tempPcs, unit:'pcs'},
+          {item:'Temp bars total length', qty:tempTotalLen, unit:'running m', hidden:true},
           {item:'Total slab rebar weight', qty:totalWeight, unit:'kg'},
           {item:'Tie wire', qty:totalWeight*c.tieWirePerKg, unit:'kg'},
         ];
@@ -2253,16 +2370,22 @@ const modules = {
       if(v.type==='footing'){
         const kgPerM_d1 = (v.dir1Dia*v.dir1Dia)/162;
         const kgPerM_d2 = (v.dir2Dia*v.dir2Dia)/162;
-        const d1Bars = Math.ceil(v.fWid*1000/v.dir1Spacing) + 1;
-        const d1BarLen = v.fLen * waste;
-        const d1Weight = d1Bars * d1BarLen * kgPerM_d1;
-        const d2Bars = Math.ceil(v.fLen*1000/v.dir2Spacing) + 1;
-        const d2BarLen = v.fWid * waste;
-        const d2Weight = d2Bars * d2BarLen * kgPerM_d2;
+        const dir1Spacing = v.dir1Spacing > 0 ? v.dir1Spacing : 100;
+        const dir2Spacing = v.dir2Spacing > 0 ? v.dir2Spacing : 100;
+        const d1Bars = Math.ceil(v.fWid*1000/dir1Spacing) + 1;
+        const d1TotalLen = d1Bars * v.fLen * waste;
+        const d1Pcs = Math.ceil(d1TotalLen / stockLen);
+        const d1Weight = d1TotalLen * kgPerM_d1;
+        const d2Bars = Math.ceil(v.fLen*1000/dir2Spacing) + 1;
+        const d2TotalLen = d2Bars * v.fWid * waste;
+        const d2Pcs = Math.ceil(d2TotalLen / stockLen);
+        const d2Weight = d2TotalLen * kgPerM_d2;
         const totalWeight = d1Weight + d2Weight;
         return [
-          {item:'Dir. 1 bars', qty:d1Bars, unit:'pcs'},
-          {item:'Dir. 2 bars', qty:d2Bars, unit:'pcs'},
+          {item:`Dir. 1 bars (${v.dir1Dia}mm × ${stockLen}m ea.)`, qty:d1Pcs, unit:'pcs'},
+          {item:'Dir. 1 bars total length', qty:d1TotalLen, unit:'running m', hidden:true},
+          {item:`Dir. 2 bars (${v.dir2Dia}mm × ${stockLen}m ea.)`, qty:d2Pcs, unit:'pcs'},
+          {item:'Dir. 2 bars total length', qty:d2TotalLen, unit:'running m', hidden:true},
           {item:'Total footing rebar weight', qty:totalWeight, unit:'kg'},
           {item:'Tie wire', qty:totalWeight*c.tieWirePerKg, unit:'kg'},
         ];
@@ -2394,7 +2517,8 @@ const modules = {
       {id:'groutPerM2', label:'Colored grout', unit:'kg / sq.m.', def:0.4},
     ],
     compute(v,c){
-      const tileArea = v.tileSize*v.tileSize;
+      const tileSize = v.tileSize > 0 ? v.tileSize : 0.3;
+      const tileArea = tileSize*tileSize;
       const waste = 1 + c.wastePct/100;
       const pcs = Math.ceil((v.area/tileArea)*waste);
       const results = [
@@ -2457,7 +2581,7 @@ const modules = {
     ],
     compute(v,c){
       const waste = 1 + c.wastePct/100;
-      const sheetArea = v.sheetLength*c.effWidth;
+      const sheetArea = v.sheetLength > 0 ? v.sheetLength * c.effWidth : 1;
       const sheets = Math.ceil((v.roofArea/sheetArea)*waste);
       const screws = sheets*c.screwsPerSheet;
       const ridgeCap = v.ridgeLen * c.ridgeCapPerM;
@@ -2535,12 +2659,16 @@ const modules = {
       const groundWire = wireType < 3 ? wire * c.groundWirePct / 100 : 0;
       const cableTies = Math.ceil(conduit * c.cableTiePerM);
       const elecTape = totalBoxes * c.elecTapePerBox;
-      const totalWire = wire + groundWire;
-      return [
+      const results = [
         {item:'Lighting points', qty:v.lightingPoints, unit:'pcs'},
         {item:'Convenience outlets', qty:v.outlets, unit:'pcs'},
         {item:'Switches', qty:v.switches, unit:'pcs'},
-        {item:'Wire', qty:wire, unit:'m'},
+        {item:'Circuit wire', qty:wire, unit:'m'},
+      ];
+      if(groundWire > 0){
+        results.push({item:'Ground wire', qty:groundWire, unit:'m'});
+      }
+      results.push(
         {item:'Conduit / pipe', qty:conduit, unit:'m'},
         {item:'Junction boxes', qty:junctionBoxes, unit:'pcs'},
         {item:'Switch boxes', qty:switchBoxes, unit:'pcs'},
@@ -2548,7 +2676,8 @@ const modules = {
         {item:'Panel / breaker boxes', qty:v.panels, unit:'pcs'},
         {item:'Cable ties', qty:cableTies, unit:'pcs'},
         {item:'Electrical tape', qty:elecTape, unit:'m'},
-      ];
+      );
+      return results;
     }
   },
 
@@ -2751,17 +2880,26 @@ const modules = {
     coeffs:[
       {id:'boltPerMember', label:'Bolts per connection', unit:'pcs', def:4},
       {id:'connectionsPerMember', label:'Connections per member', unit:'pcs', def:2},
-      {id:'weldingRodPerKg', label:'Welding rods', unit:'kg per kg steel', def:0.05},
+      {id:'steelWeightPerM', label:'Steel weight per meter', unit:'kg/m', def:0},
+      {id:'weldingRodPerKg', label:'Welding rods per kg steel', unit:'kg/kg', def:0.05},
     ],
     compute(v,c){
       const totalLen = v.len * v.count;
       const bolts = v.count * c.boltPerMember * c.connectionsPerMember;
+      const steelWeight = totalLen * c.steelWeightPerM;
+      const weldingRods = steelWeight * c.weldingRodPerKg;
       const results = [
         {item:'Steel length (total)', qty:totalLen, unit:'running m'},
         {item:'Bolts', qty:bolts, unit:'pcs'},
       ];
+      if(steelWeight > 0){
+        results.push({item:'Steel weight', qty:steelWeight, unit:'kg'});
+      }
       if(v.plateArea > 0){
         results.push({item:'Steel plates', qty:v.plateArea, unit:'sq.m.'});
+      }
+      if(weldingRods > 0){
+        results.push({item:'Welding rods', qty:weldingRods, unit:'kg'});
       }
       return results;
     }
@@ -3047,7 +3185,8 @@ function renderPanel(){
       {key:'Electrical: Lighting points', unit:'pcs', cat:'Electrical'},
       {key:'Electrical: Convenience outlets', unit:'pcs', cat:'Electrical'},
       {key:'Electrical: Switches', unit:'pcs', cat:'Electrical'},
-      {key:'Electrical: Wire', unit:'m', cat:'Electrical'},
+      {key:'Electrical: Circuit wire', unit:'m', cat:'Electrical'},
+      {key:'Electrical: Ground wire', unit:'m', cat:'Electrical'},
       {key:'Electrical: Conduit / pipe', unit:'m', cat:'Electrical'},
       {key:'Electrical: Junction boxes', unit:'pcs', cat:'Electrical'},
       {key:'Electrical: Switch boxes', unit:'pcs', cat:'Electrical'},
@@ -3071,7 +3210,8 @@ function renderPanel(){
       {key:'Ceiling: Hangers', unit:'pcs', cat:'Ceiling'},
       {key:'Ceiling: Screws', unit:'pcs', cat:'Ceiling'},
       {key:'Ceiling: Angle molding', unit:'m', cat:'Ceiling'},
-      {key:'Steel Works: Steel length', unit:'running m', cat:'Steel Works'},
+      {key:'Steel Works: Steel length (total)', unit:'running m', cat:'Steel Works'},
+      {key:'Steel Works: Steel weight', unit:'kg', cat:'Steel Works'},
       {key:'Steel Works: Bolts', unit:'pcs', cat:'Steel Works'},
       {key:'Steel Works: Steel plates', unit:'sq.m.', cat:'Steel Works'},
       {key:'Steel Works: Welding rods', unit:'kg', cat:'Steel Works'},
@@ -3630,7 +3770,7 @@ function renderPanel(){
       const type = left.querySelector('#f_'+labelSelectId).value;
       const set = m.memberLabels[type];
       if(!set) return;
-      ['len','wid','thk'].forEach(fid=>{
+      ['len','wid','thk','hgt'].forEach(fid=>{
         const lbl = left.querySelector('#lbl_'+fid);
         if(!lbl || !set[fid]) return;
         const hint = lbl.querySelector('.hint');
@@ -3661,7 +3801,11 @@ function renderPanel(){
     m.fields.forEach(f=>{
       const el = document.getElementById('f_'+f.id);
       if(el && el.offsetParent !== null){
-        v[f.id] = (f.type==='select' || f.type==='text') ? el.value : parseFloat(el.value)||0;
+        if(f.type==='select' || f.type==='text'){
+          v[f.id] = el.value;
+        } else {
+          v[f.id] = Math.max(0, parseFloat(el.value)||0);
+        }
       }
     });
     return v;
@@ -3670,7 +3814,7 @@ function renderPanel(){
     const c={};
     m.coeffs.forEach(cc=>{
       const el = document.getElementById('c_'+cc.id);
-      c[cc.id] = typeof cc.def==='number' ? (parseFloat(el.value)||0) : el.value;
+      c[cc.id] = typeof cc.def==='number' ? Math.max(0, parseFloat(el.value)||0) : el.value;
     });
     return c;
   }
@@ -3692,10 +3836,13 @@ function renderPanel(){
     content.className = '';
     let html = '<table class="output-table"><thead><tr><th>Item</th><th style="text-align:right">Qty</th><th>Unit</th></tr></thead><tbody>';
     
+    let totalQty = 0;
     lastResults.forEach((r, i) => {
       const isHidden = r.hidden;
       const rowClass = (!isHidden && i < 3) ? ' class="highlight"' : '';
-      html += `<tr${rowClass}><td>${r.item}</td><td class="qty">${fmt(r.qty)}</td><td>${r.unit}</td></tr>`;
+      const qty = fmt(r.qty);
+      if(!isHidden) totalQty += r.qty;
+      html += `<tr${rowClass}><td>${r.item}</td><td class="qty">${qty}</td><td>${r.unit}</td></tr>`;
     });
     
     html += '</tbody></table>';
@@ -3707,14 +3854,17 @@ function renderPanel(){
     el.addEventListener('change', recompute);
   });
   document.getElementById('addBtn').onclick = ()=>{
+    let count = 0;
     lastResults.forEach(r=>{
       if(!r.hidden){
         const fullName = `${m.label}: ${r.item}`;
         const price = getPrice(fullName);
         ledger.push({id:ledgerIdSeq++, item:fullName, qty:r.qty, unit:r.unit, cost:price});
+        count++;
       }
     });
     renderLedger();
+    showToast(`${count} item${count>1?'s':''} added to estimate`);
   };
 
   recompute();
@@ -3758,14 +3908,17 @@ function renderLedger(){
   const body = document.getElementById('ledgerBody');
   const emptyMsg = document.getElementById('ledgerEmpty');
   const tableWrap = document.getElementById('estimateTableWrap');
+  const toolbar = document.getElementById('estimateToolbar');
   const countEl = document.getElementById('estimateCount');
   const totalEl = document.getElementById('grandTotal');
+  const filterInfoEl = document.getElementById('filterInfo');
   
   body.innerHTML = '';
   
   if(ledger.length === 0){
     emptyMsg.style.display = 'block';
     tableWrap.style.display = 'none';
+    toolbar.style.display = 'none';
     countEl.textContent = '0 items';
     totalEl.textContent = '₱0.00';
     return;
@@ -3773,34 +3926,71 @@ function renderLedger(){
   
   emptyMsg.style.display = 'none';
   tableWrap.style.display = 'block';
+  toolbar.style.display = 'flex';
   countEl.textContent = ledger.length + ' item' + (ledger.length > 1 ? 's' : '');
   
-  // Group by category
+  // Apply search filter
+  const searchEl = document.getElementById('boqSearch');
+  const searchTerm = searchEl ? searchEl.value.toLowerCase().trim() : '';
+  let filtered = ledger;
+  if(searchTerm){
+    filtered = ledger.filter(row => {
+      const prefix = row.item.split(':')[0].trim().toLowerCase();
+      const itemName = row.item.toLowerCase();
+      return itemName.includes(searchTerm) || prefix.includes(searchTerm);
+    });
+    if(filterInfoEl) filterInfoEl.textContent = 'Showing ' + filtered.length + ' of ' + ledger.length + ' items';
+  } else {
+    if(filterInfoEl) filterInfoEl.textContent = '';
+  }
+  
+  // Apply sorting
+  const sortKey = currentSort.key;
+  const sortDir = currentSort.dir;
+  filtered = [...filtered].sort((a, b) => {
+    let va, vb;
+    switch(sortKey){
+      case 'category': va = getCategoryName(a.item); vb = getCategoryName(b.item); break;
+      case 'item': va = a.item; vb = b.item; break;
+      case 'qty': va = a.qty; vb = b.qty; break;
+      case 'cost': va = a.cost; vb = b.cost; break;
+      case 'amount': va = a.qty*a.cost; vb = b.qty*b.cost; break;
+      default: va = a.id; vb = b.id;
+    }
+    if(typeof va === 'string') return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortDir === 'asc' ? va - vb : vb - va;
+  });
+  
+  // Group by category (preserving sort order within groups)
   const groups = {};
-  ledger.forEach(row => {
+  const catOrder = [];
+  filtered.forEach(row => {
     const cat = getCategoryName(row.item);
-    if(!groups[cat]) groups[cat] = [];
+    if(!groups[cat]){ groups[cat] = []; catOrder.push(cat); }
     groups[cat].push(row);
   });
   
-  const categoryOrder = ['Earthwork', 'Concrete Works', 'Structural', 'Masonry', 'Carpentry', 'Formwork', 'Finishes', 'Roofing', 'Openings', 'MEP', 'Labor Costs', 'Equipment Costs', 'Overhead & Profit', 'Custom Items', 'Other'];
-  const sortedCats = Object.keys(groups).sort((a, b) => {
-    const ai = categoryOrder.indexOf(a);
-    const bi = categoryOrder.indexOf(b);
-    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-  });
+  const categoryOrder = ['Earthwork','Concrete Works','Structural','Masonry','Carpentry','Formwork','Finishes','Roofing','Openings','MEP','Labor Costs','Equipment Costs','Overhead & Profit','Custom Items','Other'];
   
-  sortedCats.forEach(cat => {
+  let grandTotal = 0;
+  
+  catOrder.forEach(cat => {
+    const items = groups[cat];
+    let catSubtotal = 0;
+    
     // Category header row
     const catTr = document.createElement('tr');
     catTr.className = 'category-row';
-    catTr.innerHTML = `<td colspan="7">${cat}</td>`;
+    catTr.innerHTML = '<td colspan="7">' + cat + '</td>';
     body.appendChild(catTr);
     
     // Items in this category
-    groups[cat].forEach(row => {
+    items.forEach(row => {
       const tr = document.createElement('tr');
+      tr.className = 'data-row';
       const amount = row.qty * row.cost;
+      catSubtotal += amount;
+      grandTotal += amount;
       const prefix = row.item.split(':')[0].trim();
       const itemName = row.item.replace(prefix + ':', '').trim();
       
@@ -3827,10 +4017,26 @@ function renderLedger(){
       
       body.appendChild(tr);
     });
+    
+    // Category subtotal row
+    if(items.length > 1){
+      const subTr = document.createElement('tr');
+      subTr.className = 'subtotal-row';
+      subTr.innerHTML = `<td colspan="5"><span class="subtotal-label">Subtotal — ${cat}</span></td><td class="col-amount">₱${fmt(catSubtotal)}</td><td></td>`;
+      body.appendChild(subTr);
+    }
   });
   
-  updateEstimateTotal();
+  // Grand total row
+  const gtTr = document.createElement('tr');
+  gtTr.className = 'grandtotal-row';
+  gtTr.innerHTML = `<td colspan="5">TOTAL ESTIMATE</td><td class="col-amount">₱${fmt(grandTotal)}</td><td></td>`;
+  body.appendChild(gtTr);
+  
+  totalEl.textContent = '₱' + fmt(grandTotal);
 }
+
+let currentSort = {key:'id', dir:'asc'};
 
 function updateEstimateTotal(){
   const grand = ledger.reduce((s, r) => s + r.qty * r.cost, 0);
@@ -3838,9 +4044,33 @@ function updateEstimateTotal(){
   if(totalEl) totalEl.textContent = '₱' + fmt(grand);
 }
 
+function setupBOSorting(){
+  document.querySelectorAll('.estimate-table th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.sort;
+      if(currentSort.key === key){
+        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.key = key;
+        currentSort.dir = 'asc';
+      }
+      document.querySelectorAll('.estimate-table th.sortable').forEach(t => {
+        t.classList.remove('sort-asc','sort-desc');
+      });
+      th.classList.add(currentSort.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+      renderLedger();
+    });
+  });
+  
+  const searchEl = document.getElementById('boqSearch');
+  if(searchEl){
+    searchEl.addEventListener('input', () => renderLedger());
+  }
+}
+
 function clearLedger(){
   if(ledger.length === 0) return;
-  showConfirm('Clear Estimate', 'Clear the entire estimate? This cannot be undone.', () => {
+  showConfirm('Clear Estimate', 'Clear all ' + ledger.length + ' items from the estimate? This cannot be undone.', () => {
     ledger = [];
     renderLedger();
     showToast('Estimate cleared', 'info');
@@ -3856,11 +4086,12 @@ function generatePDF(){
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
   const timeStr = now.toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+  const refNo = 'EP-' + now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
   
   function sanitizeFilename(s){ return (s||'Estimate').replace(/[^a-zA-Z0-9-_ ]/g,'').trim().replace(/\s+/g,'_').substring(0,50); }
   const filename = sanitizeFilename(projectInfo.title) + '_Construction_Estimate_' + now.toISOString().slice(0,10) + '.pdf';
   
-  // Organize items by category
+  // Organize items by module
   const modules = {};
   ledger.forEach(r=>{
     const parts = r.item.split(': ');
@@ -3894,135 +4125,160 @@ function generatePDF(){
   };
   const modOrder = ['Excavation','Concrete','CHB Masonry','Plastering','Reinforcement','Painting','Tiling','Roofing','Doors/Windows','Electrical','Form/Scaffold','Lumber','Ceiling','Steel Works','Plumbing','Waterproofing','Custom','Labor','Equipment','Overhead'];
   
-  // Calculate grand total and item count
   let grandTotal = 0;
   let itemCount = 0;
   ledger.forEach(r => { grandTotal += r.qty * r.cost; itemCount++; });
   
-  // Helper functions
   const pageW = 210, pageH = 297;
   const marginL = 14, marginR = 14;
   const contentW = pageW - marginL - marginR;
+  let totalPages = 1;
+  let currentPage = 1;
   
   function fmtP(n){ return n.toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
   function fmtQ(n){ return n.toLocaleString('en-PH',{minimumFractionDigits:0,maximumFractionDigits:2}); }
-  
-  function addFooter(pageNum, totalPages){
-    doc.setFontSize(7);
-    doc.setFont('helvetica','normal');
-    doc.setTextColor(140, 140, 140);
-    doc.text('ESTIMATE PRO  |  Construction Estimate  |  Generated: ' + dateStr + ' ' + timeStr, marginL, pageH - 8);
-    doc.text('Page ' + pageNum + ' of ' + totalPages, pageW - marginR, pageH - 8, {align:'right'});
-    doc.setDrawColor(220, 220, 220);
-    doc.line(marginL, pageH - 12, pageW - marginR, pageH - 12);
-  }
   
   function addHeaderBar(){
     doc.setFillColor(25, 35, 50);
     doc.rect(0, 0, pageW, 3, 'F');
   }
   
-  // ============ PAGE 1 — COVER ============
-  addHeaderBar();
-  
-  // Top accent line
-  doc.setFillColor(59, 130, 246);
-  doc.rect(0, 3, pageW, 1.5, 'F');
-  
-  // Document title area
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(28);
-  doc.setTextColor(25, 35, 50);
-  doc.text('CONSTRUCTION', marginL, 35);
-  doc.text('ESTIMATE', marginL, 46);
-  
-  // Blue accent bar
-  doc.setFillColor(59, 130, 246);
-  doc.rect(marginL, 52, 40, 1, 'F');
-  
-  // Project info
-  let infoY = 68;
-  doc.setFont('helvetica','normal');
-  doc.setFontSize(10);
-  doc.setTextColor(100, 100, 100);
-  
-  function infoRow(label, value){
-    if(!value) return;
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(8);
-    doc.setTextColor(130, 130, 130);
-    doc.text(label.toUpperCase(), marginL, infoY);
+  function addFooter(pNum, pTotal){
+    doc.setFontSize(7);
     doc.setFont('helvetica','normal');
-    doc.setFontSize(11);
-    doc.setTextColor(40, 40, 40);
-    doc.text(value, marginL + 35, infoY);
-    infoY += 9;
+    doc.setTextColor(140, 140, 140);
+    doc.text('ESTIMATE PRO  |  Construction Cost Estimate  |  ' + (projectInfo.title || 'Untitled Project'), marginL, pageH - 8);
+    doc.text('Page ' + pNum + ' of ' + pTotal, pageW - marginR, pageH - 8, {align:'right'});
+    doc.setDrawColor(220, 220, 220);
+    doc.line(marginL, pageH - 12, pageW - marginR, pageH - 12);
   }
   
-  infoRow('Project', projectInfo.title || 'Untitled Project');
-  infoRow('Owner', projectInfo.owner);
-  infoRow('Location', projectInfo.location);
-  infoRow('Date', projectInfo.date || dateStr);
-  infoRow('Units', 'Metric (SI)');
-  infoRow('Currency', 'Philippine Peso (₱)');
+  function checkPage(needed, y){
+    if(y + needed > pageH - 20){
+      addFooter(currentPage, totalPages);
+      doc.addPage();
+      totalPages++;
+      currentPage++;
+      return 16;
+    }
+    return y;
+  }
   
-  // Summary box
-  infoY += 8;
-  doc.setFillColor(245, 247, 250);
-  doc.roundedRect(marginL, infoY, contentW, 42, 3, 3, 'F');
-  doc.setDrawColor(220, 225, 230);
-  doc.roundedRect(marginL, infoY, contentW, 42, 3, 3, 'S');
-  
-  doc.setFont('helvetica','normal');
-  doc.setFontSize(8);
-  doc.setTextColor(120, 120, 120);
-  doc.text('ESTIMATE SUMMARY', marginL + 10, infoY + 12);
-  
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(24);
-  doc.setTextColor(25, 35, 50);
-  doc.text('₱ ' + fmtP(grandTotal), marginL + 10, infoY + 30);
-  
-  doc.setFont('helvetica','normal');
-  doc.setFontSize(9);
-  doc.setTextColor(100, 100, 100);
-  doc.text('TOTAL ESTIMATE', marginL + 10, infoY + 36);
-  
-  doc.setFontSize(10);
-  doc.setTextColor(40, 40, 40);
-  doc.text(itemCount + ' BOQ Items', pageW - marginR - 10, infoY + 28, {align:'right'});
-  doc.setFontSize(8);
-  doc.setTextColor(120, 120, 120);
-  doc.text('Line Items', pageW - marginR - 10, infoY + 34, {align:'right'});
-  
-  addFooter(1, 'X');
-  
-  // ============ PAGE 2+ — BOQ TABLE ============
-  doc.addPage();
-  addHeaderBar();
-  
-  // Table header
-  let totalPages = 2;
-  
-  function drawTableHeader(yPos){
-    // Header bar
+  function drawBQHeader(yPos){
     doc.setFillColor(25, 35, 50);
-    doc.rect(marginL, yPos, contentW, 8, 'F');
+    doc.rect(marginL, yPos, contentW, 7, 'F');
     doc.setFont('helvetica','bold');
     doc.setFontSize(7);
     doc.setTextColor(255, 255, 255);
-    doc.text('ITEM NO.', marginL + 2, yPos + 5.5);
-    doc.text('DESCRIPTION', marginL + 22, yPos + 5.5);
-    doc.text('QTY', marginL + 115, yPos + 5.5, {align:'center'});
-    doc.text('UNIT', marginL + 135, yPos + 5.5, {align:'center'});
-    doc.text('UNIT COST', marginL + 158, yPos + 5.5, {align:'center'});
-    doc.text('AMOUNT', marginL + contentW - 2, yPos + 5.5, {align:'right'});
+    doc.text('ITEM', marginL + 2, yPos + 5);
+    doc.text('DESCRIPTION', marginL + 16, yPos + 5);
+    doc.text('QTY', marginL + 118, yPos + 5, {align:'center'});
+    doc.text('UNIT', marginL + 136, yPos + 5, {align:'center'});
+    doc.text('UNIT COST', marginL + 156, yPos + 5, {align:'center'});
+    doc.text('AMOUNT', marginL + contentW - 2, yPos + 5, {align:'right'});
+    return yPos + 9;
+  }
+  
+  // ============ PAGE 1 — COVER / PROJECT INFORMATION ============
+  addHeaderBar();
+  
+  // Blue accent line
+  doc.setFillColor(59, 130, 246);
+  doc.rect(0, 3, pageW, 1.5, 'F');
+  
+  // Title block
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(8);
+  doc.setTextColor(59, 130, 246);
+  doc.text('ESTIMATE PRO', marginL, 18);
+  
+  doc.setFontSize(28);
+  doc.setTextColor(25, 35, 50);
+  doc.text('CONSTRUCTION', marginL, 34);
+  doc.text('COST ESTIMATE', marginL, 45);
+  
+  // Blue accent bar
+  doc.setFillColor(59, 130, 246);
+  doc.rect(marginL, 50, 40, 1, 'F');
+  
+  // Project information table
+  let infoY = 62;
+  const col1X = marginL;
+  const col2X = marginL + 40;
+  
+  function addInfoRow(label, value, yPos){
+    if(!value) return yPos;
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8);
+    doc.setTextColor(120, 120, 120);
+    doc.text(label.toUpperCase(), col1X, yPos);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(11);
+    doc.setTextColor(40, 40, 40);
+    doc.text(value, col2X, yPos);
     return yPos + 10;
   }
   
+  infoY = addInfoRow('Project Name', projectInfo.title || 'Untitled Project', infoY);
+  infoY = addInfoRow('Project Location', projectInfo.location, infoY);
+  infoY = addInfoRow('Prepared By', projectInfo.owner || '—', infoY);
+  infoY = addInfoRow('Date', projectInfo.date || dateStr, infoY);
+  infoY = addInfoRow('Reference No.', refNo, infoY);
+  infoY = addInfoRow('Currency', 'Philippine Peso (₱)', infoY);
+  infoY = addInfoRow('Units', 'Metric (SI)', infoY);
+  
+  // Summary box
+  infoY += 6;
+  doc.setFillColor(245, 247, 250);
+  doc.roundedRect(marginL, infoY, contentW, 38, 3, 3, 'F');
+  doc.setDrawColor(220, 225, 230);
+  doc.roundedRect(marginL, infoY, contentW, 38, 3, 3, 'S');
+  
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(120, 120, 120);
+  doc.text('ESTIMATE SUMMARY', marginL + 10, infoY + 10);
+  
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(22);
+  doc.setTextColor(25, 35, 50);
+  doc.text('₱ ' + fmtP(grandTotal), marginL + 10, infoY + 24);
+  
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(100, 100, 100);
+  doc.text('TOTAL ESTIMATE', marginL + 10, infoY + 30);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(40, 40, 40);
+  doc.text(itemCount + ' BOQ Items', pageW - marginR - 10, infoY + 22, {align:'right'});
+  
+  // Separator line
+  infoY += 48;
+  doc.setDrawColor(220, 225, 230);
+  doc.setLineWidth(0.3);
+  doc.line(marginL, infoY, marginL + contentW, infoY);
+  infoY += 8;
+  
+  // Scope note
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(100, 100, 100);
+  const scopeText = 'This estimate is based on the quantities derived from the project design documents and standard estimating factors. It is intended for preliminary budgeting purposes. Final costs should be verified against current market prices and project-specific specifications.';
+  const scopeLines = doc.splitTextToSize(scopeText, contentW);
+  doc.text(scopeLines, marginL, infoY);
+  
+  addFooter(1, totalPages);
+  
+  // ============ PAGE 2+ — BILL OF QUANTITIES ============
+  doc.addPage();
+  totalPages++;
+  currentPage = 2;
+  addHeaderBar();
+  
   // BOQ title
   doc.setFont('helvetica','bold');
-  doc.setFontSize(12);
+  doc.setFontSize(14);
   doc.setTextColor(25, 35, 50);
   doc.text('BILL OF QUANTITIES', marginL, 16);
   
@@ -4032,26 +4288,18 @@ function generatePDF(){
   doc.text((projectInfo.title || 'Untitled Project') + '  |  ' + (projectInfo.date || dateStr), marginL, 22);
   
   let y = 30;
-  y = drawTableHeader(y);
+  y = drawBQHeader(y);
   
   let modIdx = 0;
-  let itemNo = 0;
   
   modOrder.forEach(mod => {
     if(!modules[mod] || modules[mod].length === 0) return;
     const items = modules[mod];
     const label = modLabels[mod] || mod;
     
-    // Check if category header fits
-    if(y > pageH - 30){
-      addFooter(totalPages - 1, totalPages);
-      doc.addPage();
-      totalPages++;
-      y = 16;
-      y = drawTableHeader(y);
-    }
-    
     // Category header
+    y = checkPage(20, y);
+    
     doc.setFillColor(240, 243, 247);
     doc.rect(marginL, y, contentW, 7, 'F');
     doc.setFont('helvetica','bold');
@@ -4060,18 +4308,14 @@ function generatePDF(){
     doc.text(String.fromCharCode(65 + modIdx) + '. ' + label.toUpperCase(), marginL + 2, y + 5);
     y += 9;
     
-    // Items
+    let catSubtotal = 0;
+    
     items.forEach((item, i) => {
-      if(y > pageH - 25){
-        addFooter(totalPages - 1, totalPages);
-        doc.addPage();
-        totalPages++;
-        y = 16;
-        y = drawTableHeader(y);
-      }
+      y = checkPage(8, y);
       
       const rowH = 6;
       const isEven = i % 2 === 0;
+      catSubtotal += item.amount;
       
       if(isEven){
         doc.setFillColor(248, 249, 251);
@@ -4084,39 +4328,50 @@ function generatePDF(){
       
       const itemNoStr = String.fromCharCode(65 + modIdx) + '.' + (i + 1);
       doc.text(itemNoStr, marginL + 3, y + 4);
-      doc.text(item.name.substring(0, 42), marginL + 22, y + 4);
-      doc.text(fmtQ(item.qty), marginL + 115, y + 4, {align:'center'});
-      doc.text(item.unit.substring(0, 10), marginL + 135, y + 4, {align:'center'});
+      doc.text(item.name.substring(0, 42), marginL + 16, y + 4);
+      doc.text(fmtQ(item.qty), marginL + 118, y + 4, {align:'center'});
+      doc.text(item.unit.substring(0, 10), marginL + 136, y + 4, {align:'center'});
       
       doc.setTextColor(40, 40, 40);
-      doc.text('₱' + fmtP(item.cost), marginL + 158, y + 4, {align:'center'});
+      doc.text('₱' + fmtP(item.cost), marginL + 156, y + 4, {align:'center'});
       doc.setFont('helvetica','bold');
       doc.text('₱' + fmtP(item.amount), marginL + contentW - 2, y + 4, {align:'right'});
       
-      // Subtle bottom line
       doc.setDrawColor(235, 238, 242);
       doc.line(marginL, y + rowH - 1, marginL + contentW, y + rowH - 1);
       
       y += rowH;
     });
     
+    // Category subtotal
+    if(items.length > 0){
+      y += 1;
+      doc.setDrawColor(200, 210, 220);
+      doc.setLineWidth(0.2);
+      doc.line(marginL + 80, y, marginL + contentW, y);
+      y += 1;
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(7);
+      doc.setTextColor(100, 100, 100);
+      doc.text('Subtotal:', marginL + 80, y + 3);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(8);
+      doc.setTextColor(25, 35, 50);
+      doc.text('₱ ' + fmtP(catSubtotal), marginL + contentW - 2, y + 3, {align:'right'});
+      y += 6;
+    }
+    
     y += 2;
     modIdx++;
   });
   
   // Grand total
-  if(y > pageH - 30){
-    addFooter(totalPages - 1, totalPages);
-    doc.addPage();
-    totalPages++;
-    y = 16;
-  }
-  
-  y += 4;
+  y = checkPage(20, y);
+  y += 2;
   doc.setDrawColor(25, 35, 50);
   doc.setLineWidth(0.5);
   doc.line(marginL, y, marginL + contentW, y);
-  y += 2;
+  y += 3;
   
   doc.setFillColor(25, 35, 50);
   doc.rect(marginL, y, contentW, 12, 'F');
@@ -4125,8 +4380,43 @@ function generatePDF(){
   doc.setTextColor(255, 255, 255);
   doc.text('TOTAL ESTIMATE', marginL + 4, y + 8);
   doc.text('₱ ' + fmtP(grandTotal), marginL + contentW - 4, y + 8, {align:'right'});
+  y += 18;
   
-  // Update page numbers
+  // ============ ASSUMPTIONS / ESTIMATING BASIS ============
+  y = checkPage(60, y);
+  
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(11);
+  doc.setTextColor(25, 35, 50);
+  doc.text('ESTIMATING BASIS / NOTES', marginL, y);
+  y += 8;
+  
+  doc.setFillColor(245, 247, 250);
+  doc.roundedRect(marginL, y, contentW, 52, 2, 2, 'F');
+  y += 6;
+  
+  const notes = [
+    '1. Quantities are calculated using standard engineering formulas and typical wastage factors.',
+    '2. Default coefficients (cement bags per cu.m., sand/gravel ratios, CHB per sq.m., coverage rates, wastage %) are typical estimating values for preliminary estimates.',
+    '3. Actual material requirements vary by concrete class, mortar mix, material specifications, and local availability.',
+    '4. Unit prices should be verified against current market rates and supplier quotations for the project location.',
+    '5. This estimate excludes site preparation, permits, professional fees, and contingencies unless specifically included.',
+    '6. All quantities are in Metric (SI) units. Costs are in Philippine Peso (₱).',
+    '7. For final bidding, verify all quantities against detailed engineering drawings and project specifications.',
+  ];
+  
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(60, 60, 60);
+  notes.forEach(note => {
+    const lines = doc.splitTextToSize(note, contentW - 8);
+    doc.text(lines, marginL + 4, y);
+    y += lines.length * 3.5 + 1.5;
+  });
+  
+  addFooter(currentPage, totalPages);
+  
+  // Update page numbers on all pages
   for(let p = 1; p <= totalPages; p++){
     doc.setPage(p);
     doc.setFontSize(7);
@@ -4162,11 +4452,12 @@ function exportExcel(){
   
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
+  const refNo = 'EP-' + now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
   
   function sanitizeFilename(s){ return (s||'Estimate').replace(/[^a-zA-Z0-9-_ ]/g,'').trim().replace(/\s+/g,'_').substring(0,50); }
   const filename = sanitizeFilename(projectInfo.title) + '_Construction_Estimate_' + now.toISOString().slice(0,10) + '.xlsx';
   
-  // Organize items by category
+  // Organize items by module
   const modules = {};
   ledger.forEach(r=>{
     const parts = r.item.split(': ');
@@ -4204,189 +4495,375 @@ function exportExcel(){
   let itemCount = 0;
   ledger.forEach(r => { grandTotal += r.qty * r.cost; itemCount++; });
   
+  // Count categories with items
+  let catCount = 0;
+  modOrder.forEach(mod => { if(modules[mod] && modules[mod].length > 0) catCount++; });
+  
   const wb = XLSX.utils.book_new();
   
+  const headerStyle = {font:{bold:true,size:12,color:{rgb:'19232E'}}, alignment:{vertical:'center'}};
+  const labelStyle = {font:{bold:true,size:10,color:{rgb:'788098'}}, alignment:{vertical:'center'}};
+  const valueStyle = {font:{size:10,color:{rgb:'1A1D27'}}, alignment:{vertical:'center'}};
+  const totalLabelStyle = {font:{bold:true,size:11,color:{rgb:'19232E'}}, alignment:{vertical:'center'}};
+  const totalValueStyle = {font:{bold:true,size:14,color:{rgb:'3B82F6'}}, alignment:{vertical:'center'}, numFmt:'₱#,##0.00'};
+  const currencyFmt = '₱#,##0.00';
+  const qtyFmt = '#,##0.00';
+  
   // ============ SHEET 1: SUMMARY ============
-  const summaryRows = [];
-  summaryRows.push(['ESTIMATE PRO']);
-  summaryRows.push(['']);
-  summaryRows.push(['CONSTRUCTION COST ESTIMATE']);
-  summaryRows.push(['']);
-  summaryRows.push(['Project:', projectInfo.title || 'Untitled Project']);
-  summaryRows.push(['Owner:', projectInfo.owner || '']);
-  summaryRows.push(['Location:', projectInfo.location || '']);
-  summaryRows.push(['Date:', projectInfo.date || dateStr]);
-  summaryRows.push(['Units:', 'Metric (SI)']);
-  summaryRows.push(['Currency:', 'Philippine Peso (₱)']);
-  summaryRows.push(['']);
-  summaryRows.push(['═══════════════════════════════════════']);
-  summaryRows.push(['']);
-  summaryRows.push(['ESTIMATE SUMMARY']);
-  summaryRows.push(['']);
-  summaryRows.push(['Total BOQ Items:', itemCount]);
-  summaryRows.push(['Material Cost:', grandTotal]);
-  summaryRows.push(['']);
-  summaryRows.push(['TOTAL ESTIMATE:', grandTotal]);
+  const refNo2 = refNo;
+  const summaryData = [
+    ['ESTIMATE PRO', '', '', ''],
+    ['', '', '', ''],
+    ['CONSTRUCTION COST ESTIMATE', '', '', ''],
+    ['', '', '', ''],
+    ['PROJECT INFORMATION', '', '', ''],
+    ['', '', '', ''],
+    ['Project Name:', projectInfo.title || 'Untitled Project', '', ''],
+    ['Location:', projectInfo.location || '—', '', ''],
+    ['Prepared By:', projectInfo.owner || '—', '', ''],
+    ['Date:', projectInfo.date || dateStr, '', ''],
+    ['Reference No.:', refNo2, '', ''],
+    ['Units:', 'Metric (SI)', '', ''],
+    ['Currency:', 'Philippine Peso (₱)', '', ''],
+    ['', '', '', ''],
+    ['══════════════════════════════════════════════════════════════', '', '', ''],
+    ['', '', '', ''],
+    ['ESTIMATE SUMMARY', '', '', ''],
+    ['', '', '', ''],
+    ['Description', 'Value', '', ''],
+    ['Total BOQ Items', itemCount, '', ''],
+    ['Categories', catCount, '', ''],
+    ['Total Estimate (₱)', grandTotal, '', ''],
+  ];
   
-  const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
-  wsSummary['!cols'] = [{wch:20},{wch:40}];
+  const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+  wsSummary['!cols'] = [{wch:22},{wch:35},{wch:15},{wch:15}];
   
-  // Style summary header cells
-  wsSummary['A1'] = {t:'s',v:'ESTIMATE PRO',s:{font:{bold:true,size:16}}};
-  wsSummary['A3'] = {t:'s',v:'CONSTRUCTION COST ESTIMATE',s:{font:{bold:true,size:14}}};
-  wsSummary['A14'] = {t:'s',v:'ESTIMATE SUMMARY',s:{font:{bold:true,size:12}}};
-  wsSummary['A19'] = {t:'s',v:'TOTAL ESTIMATE:',s:{font:{bold:true,size:12}}};
-  wsSummary['B19'] = {t:'n',v:grandTotal,s:{font:{bold:true,size:12},numFmt:'₱#,##0.00'}};
-  wsSummary['B17'] = {t:'n',v:grandTotal,s:{numFmt:'₱#,##0.00'}};
+  // Apply styles
+  wsSummary['A1'] = {t:'s',v:'ESTIMATE PRO',s:{font:{bold:true,size:16,color:{rgb:'3B82F6'}}}};
+  wsSummary['A3'] = {t:'s',v:'CONSTRUCTION COST ESTIMATE',s:{font:{bold:true,size:14,color:{rgb:'19232E'}}}};
+  wsSummary['A5'] = {t:'s',v:'PROJECT INFORMATION',s:{font:{bold:true,size:11,color:{rgb:'3B82F6'}}}};
+  wsSummary['A7'] = {t:'s',v:'Project Name:',s:labelStyle};
+  wsSummary['B7'] = {t:'s',v:projectInfo.title || 'Untitled Project',s:valueStyle};
+  wsSummary['A8'] = {t:'s',v:'Location:',s:labelStyle};
+  wsSummary['B8'] = {t:'s',v:projectInfo.location || '—',s:valueStyle};
+  wsSummary['A9'] = {t:'s',v:'Prepared By:',s:labelStyle};
+  wsSummary['B9'] = {t:'s',v:projectInfo.owner || '—',s:valueStyle};
+  wsSummary['A10'] = {t:'s',v:'Date:',s:labelStyle};
+  wsSummary['B10'] = {t:'s',v:projectInfo.date || dateStr,s:valueStyle};
+  wsSummary['A11'] = {t:'s',v:'Reference No.:',s:labelStyle};
+  wsSummary['B11'] = {t:'s',v:refNo2,s:valueStyle};
+  wsSummary['A12'] = {t:'s',v:'Units:',s:labelStyle};
+  wsSummary['B12'] = {t:'s',v:'Metric (SI)',s:valueStyle};
+  wsSummary['A13'] = {t:'s',v:'Currency:',s:labelStyle};
+  wsSummary['B13'] = {t:'s',v:'Philippine Peso (₱)',s:valueStyle};
+  
+  wsSummary['A17'] = {t:'s',v:'ESTIMATE SUMMARY',s:{font:{bold:true,size:11,color:{rgb:'3B82F6'}}}};
+  wsSummary['A19'] = {t:'s',v:'Description',s:{font:{bold:true,size:10,color:{rgb:'788098'}}}};
+  wsSummary['B19'] = {t:'s',v:'Value',s:{font:{bold:true,size:10,color:{rgb:'788098'}}}};
+  wsSummary['A20'] = {t:'s',v:'Total BOQ Items',s:valueStyle};
+  wsSummary['B20'] = {t:'n',v:itemCount,s:valueStyle};
+  wsSummary['A21'] = {t:'s',v:'Categories',s:valueStyle};
+  wsSummary['B21'] = {t:'n',v:catCount,s:valueStyle};
+  wsSummary['A22'] = {t:'s',v:'Total Estimate (₱)',s:totalLabelStyle};
+  wsSummary['B22'] = {t:'n',v:grandTotal,s:totalValueStyle};
+  
+  wsSummary['!ref'] = 'A1:B22';
   
   XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
   
   // ============ SHEET 2: MASTER BOQ ============
-  const boqRows = [];
-  
-  // Header
-  boqRows.push(['ESTIMATE PRO — CONSTRUCTION ESTIMATE']);
-  boqRows.push([projectInfo.title || 'Untitled Project']);
-  boqRows.push([projectInfo.location ? 'Location: ' + projectInfo.location : '', '', '', '', projectInfo.date ? 'Date: ' + projectInfo.date : '']);
-  boqRows.push(['']);
-  boqRows.push(['Item No.', 'Category', 'Description', 'Quantity', 'Unit', 'Unit Cost', 'Amount']);
+  const boqData = [];
+  boqData.push(['', '', '', '', '', '', '']);
+  boqData.push(['Item No.', 'Category', 'Description', 'Quantity', 'Unit', 'Unit Cost', 'Amount']);
   
   let modIdx = 0;
-  let dataRowStart = 6; // first data row (0-indexed row 5 = row 6 in Excel)
-  let dataRowEnd = 5;
+  let dataRowStart = 3;
+  let dataRowEnd = 2;
+  const catSubtotalRows = [];
   
   modOrder.forEach(mod => {
     if(!modules[mod] || modules[mod].length === 0) return;
     const items = modules[mod];
     const label = modLabels[mod] || mod;
     
-    // Category header
-    boqRows.push([String.fromCharCode(65 + modIdx), label.toUpperCase(), '', '', '', '', '']);
+    boqData.push([String.fromCharCode(65 + modIdx), label.toUpperCase(), '', '', '', '', '']);
     
     items.forEach((item, i) => {
       dataRowEnd++;
-      boqRows.push([
+      boqData.push([
         String.fromCharCode(65 + modIdx) + '.' + (i + 1),
-        '',
+        label.toUpperCase(),
         item.name,
         item.qty,
         item.unit,
         item.cost,
-        {t:'n', f:`D${dataRowEnd}*F${dataRowEnd}`}
+        {t:'n', f:'D' + dataRowEnd + '*F' + dataRowEnd}
       ]);
     });
     
-    boqRows.push(['']);
+    if(items.length > 1){
+      catSubtotalRows.push(dataRowEnd + 1);
+      boqData.push(['', '', '', '', '', label.toUpperCase() + ' SUBTOTAL', {t:'n', f:'SUM(G' + (dataRowEnd - items.length + 1) + ':G' + dataRowEnd + ')'}]);
+      dataRowEnd++;
+    }
+    
+    boqData.push(['']);
     modIdx++;
   });
   
-  const totalRow = dataRowEnd + 1;
-  boqRows.push(['', '', '', '', '', 'TOTAL ESTIMATE', {t:'n', f:`SUM(G${dataRowStart}:G${dataRowEnd})`}]);
+  const totalRowNum = dataRowEnd + 1;
+  boqData.push(['', '', '', '', '', 'TOTAL ESTIMATE', {t:'n', f:'SUM(G' + dataRowStart + ':G' + dataRowEnd + ')'}]);
   
-  const wsBOQ = XLSX.utils.aoa_to_sheet(boqRows);
+  const wsBOQ = XLSX.utils.aoa_to_sheet(boqData);
   
-  // Set column widths
   wsBOQ['!cols'] = [
-    {wch:10},   // Item No.
-    {wch:12},   // Category
-    {wch:40},   // Description
-    {wch:12},   // Quantity
-    {wch:10},   // Unit
-    {wch:14},   // Unit Cost
-    {wch:16},   // Amount
+    {wch:10},
+    {wch:18},
+    {wch:42},
+    {wch:12},
+    {wch:10},
+    {wch:14},
+    {wch:16},
   ];
   
-  // Apply number formats to data rows
-  const range = XLSX.utils.decode_range(wsBOQ['!ref']);
-  for(let r = 5; r <= range.e.r; r++){
-    const qtyCell = XLSX.utils.encode_cell({r:r, c:3});
-    const costCell = XLSX.utils.encode_cell({r:r, c:5});
-    const amtCell = XLSX.utils.encode_cell({r:r, c:6});
-    
-    if(wsBOQ[qtyCell] && wsBOQ[qtyCell].t === 'n'){
-      wsBOQ[qtyCell].s = {numFmt:'#,##0.00'};
-    }
-    if(wsBOQ[costCell] && wsBOQ[costCell].t === 'n'){
-      wsBOQ[costCell].s = {numFmt:'₱#,##0.00'};
-    }
-    if(wsBOQ[amtCell]){
-      wsBOQ[amtCell].s = {numFmt:'₱#,##0.00'};
+  // Apply styles to header row
+  const boqRange = XLSX.utils.decode_range(wsBOQ['!ref']);
+  for(let c = 0; c <= 6; c++){
+    const cell = XLSX.utils.encode_cell({r:1, c:c});
+    if(wsBOQ[cell]){
+      wsBOQ[cell].s = {font:{bold:true,size:10,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'19232E'}}, alignment:{vertical:'center',horizontal:c>=3?'right':'left'}};
     }
   }
   
-  // Freeze panes (freeze row 5)
-  wsBOQ['!freeze'] = {xSplit:0, ySplit:5};
+  // Style category rows and format data rows
+  for(let r = 2; r <= boqRange.e.r; r++){
+    const catCell = XLSX.utils.encode_cell({r:r, c:0});
+    const isCategory = wsBOQ[catCell] && wsBOQ[catCell].t === 's' && wsBOQ[catCell].v.length === 1;
+    const isSubtotal = catSubtotalRows.includes(r + 1);
+    const isTotal = r + 1 === totalRowNum;
+    
+    if(isCategory){
+      for(let c = 0; c <= 6; c++){
+        const cell = XLSX.utils.encode_cell({r:r, c:c});
+        if(wsBOQ[cell]){
+          wsBOQ[cell].s = {font:{bold:true,size:10,color:{rgb:'19232E'}}, fill:{fgColor:{rgb:'F0F3F7'}}, alignment:{vertical:'center'}};
+        }
+      }
+    } else if(isSubtotal){
+      for(let c = 0; c <= 6; c++){
+        const cell = XLSX.utils.encode_cell({r:r, c:c});
+        if(wsBOQ[cell]){
+          wsBOQ[cell].s = {font:{bold:true,size:10,color:{rgb:'3B82F6'}}, alignment:{vertical:'center',horizontal:c>=5?'right':'left'}};
+        }
+      }
+      const amtCell = XLSX.utils.encode_cell({r:r, c:6});
+      if(wsBOQ[amtCell]) wsBOQ[amtCell].s = {font:{bold:true,size:10,color:{rgb:'3B82F6'}}, numFmt:currencyFmt, alignment:{vertical:'center',horizontal:'right'}};
+    } else if(isTotal){
+      for(let c = 0; c <= 6; c++){
+        const cell = XLSX.utils.encode_cell({r:r, c:c});
+        if(wsBOQ[cell]){
+          wsBOQ[cell].s = {font:{bold:true,size:11,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'19232E'}}, alignment:{vertical:'center',horizontal:c>=5?'right':'left'}};
+        }
+      }
+      const amtCell = XLSX.utils.encode_cell({r:r, c:6});
+      if(wsBOQ[amtCell]) wsBOQ[amtCell].s = {font:{bold:true,size:12,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'19232E'}}, numFmt:currencyFmt, alignment:{vertical:'center',horizontal:'right'}};
+    } else {
+      // Data rows - format qty, cost, amount
+      const qtyCell = XLSX.utils.encode_cell({r:r, c:3});
+      const costCell = XLSX.utils.encode_cell({r:r, c:5});
+      const amtCell = XLSX.utils.encode_cell({r:r, c:6});
+      
+      if(wsBOQ[qtyCell] && wsBOQ[qtyCell].t === 'n'){
+        wsBOQ[qtyCell].s = {numFmt:qtyFmt, alignment:{vertical:'center',horizontal:'right'}};
+      }
+      if(wsBOQ[costCell] && wsBOQ[costCell].t === 'n'){
+        wsBOQ[costCell].s = {numFmt:currencyFmt, alignment:{vertical:'center',horizontal:'right'}};
+      }
+      if(wsBOQ[amtCell]){
+        wsBOQ[amtCell].s = {numFmt:currencyFmt, alignment:{vertical:'center',horizontal:'right'}};
+      }
+      
+      // Alternate row shading
+      const rowIdx = r - 2;
+      if(rowIdx % 2 === 0){
+        for(let c = 0; c <= 6; c++){
+          const cell = XLSX.utils.encode_cell({r:r, c:c});
+          if(wsBOQ[cell] && !wsBOQ[cell].s){
+            wsBOQ[cell].s = {fill:{fgColor:{rgb:'F8F9FB'}}, alignment:{vertical:'center'}};
+          }
+        }
+      }
+    }
+  }
   
-  // Auto filter
-  wsBOQ['!autofilter'] = {ref:'A5:G' + (range.e.r + 1)};
+  // Freeze panes (freeze row 2)
+  wsBOQ['!freeze'] = {xSplit:0, ySplit:2};
+  
+  // Auto filter on header row
+  wsBOQ['!autofilter'] = {ref:'A2:G' + (boqRange.e.r + 1)};
   
   XLSX.utils.book_append_sheet(wb, wsBOQ, 'Master BOQ');
   
   // ============ SHEET 3: PRICE DATABASE ============
-  const priceRows = [];
-  priceRows.push(['PRICE DATABASE']);
-  priceRows.push(['']);
-  priceRows.push(['Material', 'Unit', 'Unit Price']);
+  const priceData = [];
+  priceData.push(['', '', '']);
+  priceData.push(['Material', 'Unit', 'Unit Price (₱)']);
   
   const allPriceItems = [
-    {key:'Concrete: Cement', unit:'bags (40kg)'},
-    {key:'Concrete: Sand', unit:'cu.m.'},
-    {key:'Concrete: Gravel', unit:'cu.m.'},
-    {key:'CHB Masonry: CHB (4")', unit:'pcs'},
-    {key:'CHB Masonry: CHB (6")', unit:'pcs'},
-    {key:'CHB Masonry: Mortar cement', unit:'bags (40kg)'},
-    {key:'CHB Masonry: Mortar sand', unit:'cu.m.'},
-    {key:'Reinforcement: Bars (12mm × 6m ea.)', unit:'pcs'},
-    {key:'Reinforcement: Tie wire', unit:'kg'},
-    {key:'Plastering: Cement (12mm)', unit:'bags (40kg)'},
-    {key:'Plastering: Sand (12mm)', unit:'cu.m.'},
-    {key:'Painting: Primer', unit:'liters'},
-    {key:'Painting: Topcoat', unit:'liters'},
-    {key:'Tiling: Tiles needed', unit:'pcs'},
-    {key:'Tiling: Tile adhesive', unit:'kg'},
-    {key:'Roofing: Roofing sheets', unit:'pcs'},
-    {key:'Electrical: Wire', unit:'m'},
-    {key:'Plumbing: Supply pipe (20mm)', unit:'m'},
-    {key:'Waterproofing: Roof membrane', unit:'sq.m.'},
+    {key:'Concrete: Cement', unit:'bags (40kg)', cat:'Concrete'},
+    {key:'Concrete: Sand', unit:'cu.m.', cat:'Concrete'},
+    {key:'Concrete: Gravel', unit:'cu.m.', cat:'Concrete'},
+    {key:'CHB Masonry: CHB (4")', unit:'pcs', cat:'Masonry'},
+    {key:'CHB Masonry: CHB (6")', unit:'pcs', cat:'Masonry'},
+    {key:'CHB Masonry: Mortar cement', unit:'bags (40kg)', cat:'Masonry'},
+    {key:'CHB Masonry: Mortar sand', unit:'cu.m.', cat:'Masonry'},
+    {key:'Reinforcement: Bars (10mm × 6m ea.)', unit:'pcs', cat:'Reinforcement'},
+    {key:'Reinforcement: Bars (12mm × 6m ea.)', unit:'pcs', cat:'Reinforcement'},
+    {key:'Reinforcement: Bars (16mm × 6m ea.)', unit:'pcs', cat:'Reinforcement'},
+    {key:'Reinforcement: Bars (20mm × 6m ea.)', unit:'pcs', cat:'Reinforcement'},
+    {key:'Reinforcement: Bars (25mm × 6m ea.)', unit:'pcs', cat:'Reinforcement'},
+    {key:'Reinforcement: Tie wire', unit:'kg', cat:'Reinforcement'},
+    {key:'Plastering: Cement (12mm)', unit:'bags (40kg)', cat:'Plastering'},
+    {key:'Plastering: Sand (12mm)', unit:'cu.m.', cat:'Plastering'},
+    {key:'Plastering: Wire mesh / lath', unit:'sq.m.', cat:'Plastering'},
+    {key:'Painting: Primer', unit:'liters (4L pail)', cat:'Painting'},
+    {key:'Painting: Topcoat', unit:'liters (4L pail)', cat:'Painting'},
+    {key:'Painting: Putty / filler', unit:'kg', cat:'Painting'},
+    {key:'Painting: Sandpaper', unit:'sheets', cat:'Painting'},
+    {key:'Tiling: Tiles needed', unit:'pcs', cat:'Tiling'},
+    {key:'Tiling: Tile adhesive', unit:'kg', cat:'Tiling'},
+    {key:'Tiling: Mortar cement', unit:'bags (40kg)', cat:'Tiling'},
+    {key:'Tiling: Mortar sand', unit:'cu.m.', cat:'Tiling'},
+    {key:'Roofing: Roofing sheets', unit:'pcs', cat:'Roofing'},
+    {key:'Roofing: Screws / rivets', unit:'pcs', cat:'Roofing'},
+    {key:'Roofing: Ridge cap', unit:'m', cat:'Roofing'},
+    {key:'Roofing: Purlins (weight)', unit:'kg', cat:'Roofing'},
+    {key:'Electrical: Circuit wire', unit:'m', cat:'Electrical'},
+    {key:'Electrical: Ground wire', unit:'m', cat:'Electrical'},
+    {key:'Electrical: Conduit / pipe', unit:'m', cat:'Electrical'},
+    {key:'Electrical: Junction boxes', unit:'pcs', cat:'Electrical'},
+    {key:'Steel Works: Steel length (total)', unit:'running m', cat:'Steel Works'},
+    {key:'Steel Works: Steel weight', unit:'kg', cat:'Steel Works'},
+    {key:'Steel Works: Welding rods', unit:'kg', cat:'Steel Works'},
+    {key:'Steel Works: Bolts', unit:'pcs', cat:'Steel Works'},
+    {key:'Plumbing: Supply pipe (20mm)', unit:'m', cat:'Plumbing'},
+    {key:'Plumbing: Drain pipe (100mm)', unit:'m', cat:'Plumbing'},
+    {key:'Waterproofing: Roof membrane', unit:'sq.m.', cat:'Waterproofing'},
+    {key:'Waterproofing: Wet area membrane', unit:'sq.m.', cat:'Waterproofing'},
   ];
+  
+  // Add custom items from localStorage
+  let customItems = [];
+  try { customItems = JSON.parse(localStorage.getItem('customPriceItems') || '[]'); } catch(e){}
+  customItems.forEach(item => {
+    allPriceItems.push({key:item.key, unit:item.unit || 'pcs', cat:'Custom'});
+  });
   
   allPriceItems.forEach(item => {
     const price = priceDB[item.key] || 0;
-    if(price > 0){
-      priceRows.push([item.key, item.unit, price]);
-    }
+    priceData.push([item.key, item.unit, price > 0 ? price : '']);
   });
   
-  // Add any custom priced items
-  let customItems = JSON.parse(localStorage.getItem('customPriceItems') || '[]');
-  customItems.forEach(item => {
-    const price = priceDB[item.key] || 0;
-    if(price > 0){
-      priceRows.push([item.key, item.unit || 'pcs', price]);
-    }
-  });
+  const wsPrice = XLSX.utils.aoa_to_sheet(priceData);
+  wsPrice['!cols'] = [{wch:45},{wch:18},{wch:16}];
   
-  if(priceRows.length > 3){
-    const wsPrice = XLSX.utils.aoa_to_sheet(priceRows);
-    wsPrice['!cols'] = [{wch:40},{wch:15},{wch:14}];
-    
-    // Format price column
-    const pRange = XLSX.utils.decode_range(wsPrice['!ref']);
-    for(let r = 3; r <= pRange.e.r; r++){
-      const priceCell = XLSX.utils.encode_cell({r:r, c:2});
-      if(wsPrice[priceCell] && wsPrice[priceCell].t === 'n'){
-        wsPrice[priceCell].s = {numFmt:'₱#,##0.00'};
+  // Style header
+  wsPrice['A1'] = {t:'s',v:'PRICE DATABASE',s:{font:{bold:true,size:14,color:{rgb:'19232E'}}}};
+  wsPrice['A2'] = {t:'s',v:'Material',s:{font:{bold:true,size:10,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'19232E'}}, alignment:{vertical:'center'}}};
+  wsPrice['B2'] = {t:'s',v:'Unit',s:{font:{bold:true,size:10,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'19232E'}}, alignment:{vertical:'center'}}};
+  wsPrice['C2'] = {t:'s',v:'Unit Price (₱)',s:{font:{bold:true,size:10,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'19232E'}}, alignment:{vertical:'center',horizontal:'right'}}};
+  
+  // Format price column and alternate rows
+  const pRange = XLSX.utils.decode_range(wsPrice['!ref']);
+  for(let r = 3; r <= pRange.e.r; r++){
+    const priceCell = XLSX.utils.encode_cell({r:r, c:2});
+    if(wsPrice[priceCell] && wsPrice[priceCell].t === 'n'){
+      wsPrice[priceCell].s = {numFmt:currencyFmt, alignment:{vertical:'center',horizontal:'right'}};
+    }
+    // Alternate row shading
+    if((r - 3) % 2 === 0){
+      for(let c = 0; c <= 2; c++){
+        const cell = XLSX.utils.encode_cell({r:r, c:c});
+        if(wsPrice[cell] && !wsPrice[cell].s){
+          wsPrice[cell].s = {fill:{fgColor:{rgb:'F8F9FB'}}, alignment:{vertical:'center'}};
+        }
       }
     }
-    
-    wsPrice['!freeze'] = {xSplit:0, ySplit:3};
-    wsPrice['!autofilter'] = {ref:'A3:C' + (pRange.e.r + 1)};
-    
-    XLSX.utils.book_append_sheet(wb, wsPrice, 'Price Database');
   }
   
+  wsPrice['!freeze'] = {xSplit:0, ySplit:2};
+  wsPrice['!autofilter'] = {ref:'A2:C' + (pRange.e.r + 1)};
+  
+  XLSX.utils.book_append_sheet(wb, wsPrice, 'Price Database');
+  
   XLSX.writeFile(wb, filename);
-  showToast('Excel BOQ exported', 'success');
+  showToast('Excel workbook exported', 'success');
+}
+
+/* ---------------- backup / restore ---------------- */
+function backupProject(){
+  const backup = {
+    version: 1,
+    timestamp: new Date().toISOString(),
+    projectInfo: projectInfo,
+    ledger: ledger,
+    ledgerIdSeq: ledgerIdSeq,
+    priceDB: priceDB,
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  function sanitizeFilename(s){ return (s||'Estimate').replace(/[^a-zA-Z0-9-_ ]/g,'').trim().replace(/\s+/g,'_').substring(0,50); }
+  a.href = url;
+  a.download = sanitizeFilename(projectInfo.title) + '_Backup_' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Project backup downloaded', 'success');
+}
+
+function restoreProject(){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const backup = JSON.parse(ev.target.result);
+        if(!backup || typeof backup !== 'object') throw new Error('Invalid backup file');
+        
+        showConfirm('Restore Project', 
+          'This will replace your current project data with the backup. Continue?', 
+          () => {
+            if(backup.projectInfo) projectInfo = backup.projectInfo;
+            if(Array.isArray(backup.ledger)) ledger = backup.ledger;
+            if(typeof backup.ledgerIdSeq === 'number') ledgerIdSeq = backup.ledgerIdSeq;
+            if(backup.priceDB && typeof backup.priceDB === 'object') priceDB = backup.priceDB;
+            
+            // Save restored data to Firestore
+            if(currentUser){
+              saveUserData();
+            }
+            
+            updateHeader();
+            renderPanel();
+            renderLedger();
+            showToast('Project restored from backup', 'success');
+          }
+        );
+      } catch(err) {
+        console.error('Restore error:', err);
+        showToast('Invalid backup file', 'error');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
 }
 
 /* ---------------- init ---------------- */
@@ -4575,7 +5052,7 @@ auth.onAuthStateChanged(user => {
         } else {
           if(isAdmin){
             mainApp.style.display = 'block';
-            adminTab.style.display = 'block';
+            if(adminTab) adminTab.style.display = 'block';
             showUserInfo(user, isAdmin);
             projectOverlay.style.display = 'flex';
           } else {
@@ -4601,7 +5078,7 @@ auth.onAuthStateChanged(user => {
     mainApp.style.display = 'none';
     accessOverlay.style.display = 'none';
     projectOverlay.style.display = 'none';
-    adminTab.style.display = 'none';
+    if(adminTab) adminTab.style.display = 'none';
     hideSpinner();
   }
 });
@@ -4628,19 +5105,27 @@ function showUserInfo(user, isAdmin){
     mainApp.style.display = 'none';
   };
   document.getElementById('newProjectBtn').onclick = () => {
-    showConfirm('New Project', 'Start a new project? Current project data will be saved.', () => {
+    const hasData = ledger.length > 0 || (projectInfo.title && projectInfo.title.trim());
+    const msg = hasData 
+      ? 'Start a new project? Your current project will be saved automatically before clearing.'
+      : 'Start a new project?';
+    showConfirm('New Project', msg, () => {
+      // Save current project first
+      if(currentUser && hasData){
+        saveUserData();
+      }
       projectInfo = {};
       document.getElementById('projTitle').value = '';
       document.getElementById('projLocation').value = '';
       document.getElementById('projOwner').value = '';
       document.getElementById('projDate').value = '';
       ledger = [];
-      ledgerIdSeq = 0;
+      ledgerIdSeq = 1;
       projectOverlay.style.display = 'flex';
       mainApp.style.display = 'none';
     });
   };
-  if(isAdmin) adminTab.style.display = 'block';
+  if(isAdmin && adminTab) adminTab.style.display = 'block';
   updateHeader();
 }
 
@@ -4670,16 +5155,43 @@ function loadUserData(){
   db.collection('users').doc(currentUser.uid).get().then(doc => {
     if(doc.exists){
       const data = doc.data();
-      if(data.ledger) ledger = data.ledger;
-      if(data.priceDB) priceDB = data.priceDB;
-      if(data.ledgerIdSeq) ledgerIdSeq = data.ledgerIdSeq;
-      if(data.projectInfo){
-        projectInfo = data.projectInfo;
+      // Validate and load ledger
+      if(Array.isArray(data.ledger)){
+        ledger = data.ledger.filter(row => {
+          return row && typeof row === 'object' && typeof row.item === 'string' && typeof row.qty === 'number';
+        });
+        ledgerIdSeq = data.ledgerIdSeq || ledger.reduce((max, r) => Math.max(max, r.id || 0), 0) + 1;
+      }
+      // Validate and load priceDB
+      if(data.priceDB && typeof data.priceDB === 'object' && !Array.isArray(data.priceDB)){
+        priceDB = {};
+        Object.keys(data.priceDB).forEach(k => {
+          const v = data.priceDB[k];
+          if(typeof v === 'number' && v >= 0) priceDB[k] = v;
+        });
+      }
+      // Validate and load projectInfo
+      if(data.projectInfo && typeof data.projectInfo === 'object'){
+        projectInfo = {
+          title: typeof data.projectInfo.title === 'string' ? data.projectInfo.title : '',
+          location: typeof data.projectInfo.location === 'string' ? data.projectInfo.location : '',
+          owner: typeof data.projectInfo.owner === 'string' ? data.projectInfo.owner : '',
+          date: typeof data.projectInfo.date === 'string' ? data.projectInfo.date : '',
+        };
         updateHeader();
       }
       renderPanel();
       renderLedger();
     }
+  }).catch(err => {
+    console.error('Error loading user data:', err);
+    showToast('Error loading data. Using defaults.', 'warning');
+    ledger = [];
+    ledgerIdSeq = 1;
+    priceDB = {};
+    projectInfo = {};
+    renderPanel();
+    renderLedger();
   });
 }
 
@@ -4695,7 +5207,10 @@ function saveUserData(){
     priceDB: priceDB,
     ledgerIdSeq: ledgerIdSeq,
     lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
+  }, { merge: true }).catch(err => {
+    console.error('Save failed:', err);
+    showToast('Save failed. Check your connection.', 'error');
+  });
 }
 
 /* ---- Session timeout (30 min) ---- */
@@ -4730,10 +5245,13 @@ document.addEventListener('keydown', resetTimeout);
 resetTimeout();
 
 const origRenderLedger = renderLedger;
+let saveDebounce;
 renderLedger = function(){
   origRenderLedger();
-  saveUserData();
+  clearTimeout(saveDebounce);
+  saveDebounce = setTimeout(saveUserData, 1000);
 };
+setupBOSorting();
 </script>
 </body>
 </html>
