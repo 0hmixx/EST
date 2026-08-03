@@ -1598,6 +1598,43 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="customItemModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add Custom Item</h3>
+      <button class="modal-close" onclick="closeCustomItemModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Category</label>
+        <input type="text" id="customCat" placeholder="e.g. Labor, Equipment, Overhead">
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <input type="text" id="customDesc" placeholder="e.g. Skilled labor - mason">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Quantity</label>
+          <input type="number" step="any" id="customQty" value="1">
+        </div>
+        <div class="field">
+          <label>Unit</label>
+          <input type="text" id="customUnit" placeholder="e.g. days, pcs, sq.m.">
+        </div>
+      </div>
+      <div class="field">
+        <label>Unit Cost (₱)</label>
+        <input type="number" step="any" id="customCost" value="0">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn ghost" onclick="closeCustomItemModal()">Cancel</button>
+      <button class="btn" id="customItemSave">Add to Estimate</button>
+    </div>
+  </div>
+</div>
+
 <div class="timeout-modal" id="timeoutModal">
   <div class="timeout-box">
     <h3>SESSION EXPIRING</h3>
@@ -1756,6 +1793,7 @@
         <div class="estimate-footer">
           <div class="estimate-footer-hint">Edit unit costs to price out each line.</div>
           <div class="estimate-footer-actions">
+            <button class="btn ghost" onclick="openCustomItemModal()">+ Add Item</button>
             <button class="btn ghost" onclick="clearLedger()">Clear All</button>
             <button class="btn ghost" onclick="previewPDF()">Preview</button>
             <button class="btn ghost" onclick="exportPDF()">Export PDF</button>
@@ -3705,11 +3743,15 @@ const categoryMap = {
   'Steel Works': 'Structural',
   'Plumbing': 'MEP',
   'Waterproofing': 'Finishes',
+  'Custom': 'Custom Items',
+  'Labor': 'Labor Costs',
+  'Equipment': 'Equipment Costs',
+  'Overhead': 'Overhead & Profit',
 };
 
 function getCategoryName(itemName) {
   const prefix = itemName.split(':')[0].trim();
-  return categoryMap[prefix] || 'Other';
+  return categoryMap[prefix] || prefix || 'Other';
 }
 
 function renderLedger(){
@@ -3741,7 +3783,7 @@ function renderLedger(){
     groups[cat].push(row);
   });
   
-  const categoryOrder = ['Earthwork', 'Concrete Works', 'Structural', 'Masonry', 'Carpentry', 'Formwork', 'Finishes', 'Roofing', 'Openings', 'MEP', 'Other'];
+  const categoryOrder = ['Earthwork', 'Concrete Works', 'Structural', 'Masonry', 'Carpentry', 'Formwork', 'Finishes', 'Roofing', 'Openings', 'MEP', 'Labor Costs', 'Equipment Costs', 'Overhead & Profit', 'Custom Items', 'Other'];
   const sortedCats = Object.keys(groups).sort((a, b) => {
     const ai = categoryOrder.indexOf(a);
     const bi = categoryOrder.indexOf(b);
@@ -3845,8 +3887,12 @@ function generatePDF(){
     'Steel Works':'Structural Steel Works',
     'Plumbing':'Plumbing Works',
     'Waterproofing':'Waterproofing Works',
+    'Custom':'Custom Items',
+    'Labor':'Labor Costs',
+    'Equipment':'Equipment Costs',
+    'Overhead':'Overhead & Profit',
   };
-  const modOrder = ['Excavation','Concrete','CHB Masonry','Plastering','Reinforcement','Painting','Tiling','Roofing','Doors/Windows','Electrical','Form/Scaffold','Lumber','Ceiling','Steel Works','Plumbing','Waterproofing'];
+  const modOrder = ['Excavation','Concrete','CHB Masonry','Plastering','Reinforcement','Painting','Tiling','Roofing','Doors/Windows','Electrical','Form/Scaffold','Lumber','Ceiling','Steel Works','Plumbing','Waterproofing','Custom','Labor','Equipment','Overhead'];
   
   // Calculate grand total and item count
   let grandTotal = 0;
@@ -4147,8 +4193,12 @@ function exportExcel(){
     'Steel Works':'Structural Steel Works',
     'Plumbing':'Plumbing Works',
     'Waterproofing':'Waterproofing Works',
+    'Custom':'Custom Items',
+    'Labor':'Labor Costs',
+    'Equipment':'Equipment Costs',
+    'Overhead':'Overhead & Profit',
   };
-  const modOrder = ['Excavation','Concrete','CHB Masonry','Plastering','Reinforcement','Painting','Tiling','Roofing','Doors/Windows','Electrical','Form/Scaffold','Lumber','Ceiling','Steel Works','Plumbing','Waterproofing'];
+  const modOrder = ['Excavation','Concrete','CHB Masonry','Plastering','Reinforcement','Painting','Tiling','Roofing','Doors/Windows','Electrical','Form/Scaffold','Lumber','Ceiling','Steel Works','Plumbing','Waterproofing','Custom','Labor','Equipment','Overhead'];
   
   let grandTotal = 0;
   let itemCount = 0;
@@ -4411,6 +4461,42 @@ document.getElementById('confirmCancel').onclick = closeConfirm;
 
 document.getElementById('confirmModal').onclick = (e) => {
   if(e.target === document.getElementById('confirmModal')) closeConfirm();
+};
+
+/* ---- Custom Item Modal ---- */
+function openCustomItemModal(){
+  document.getElementById('customCat').value = '';
+  document.getElementById('customDesc').value = '';
+  document.getElementById('customQty').value = '1';
+  document.getElementById('customUnit').value = '';
+  document.getElementById('customCost').value = '0';
+  document.getElementById('customItemModal').classList.add('active');
+  document.getElementById('customDesc').focus();
+}
+
+function closeCustomItemModal(){
+  document.getElementById('customItemModal').classList.remove('active');
+}
+
+document.getElementById('customItemSave').onclick = () => {
+  const cat = document.getElementById('customCat').value.trim();
+  const desc = document.getElementById('customDesc').value.trim();
+  const qty = parseFloat(document.getElementById('customQty').value) || 0;
+  const unit = document.getElementById('customUnit').value.trim();
+  const cost = parseFloat(document.getElementById('customCost').value) || 0;
+
+  if(!desc){ showToast('Enter a description.','warning'); return; }
+  if(!unit){ showToast('Enter a unit.','warning'); return; }
+
+  const itemName = (cat ? cat + ': ' : 'Custom: ') + desc;
+  ledger.push({id:ledgerIdSeq++, item:itemName, qty:qty, unit:unit, cost:cost});
+  renderLedger();
+  closeCustomItemModal();
+  showToast('Item added to estimate','success');
+};
+
+document.getElementById('customItemModal').onclick = (e) => {
+  if(e.target === document.getElementById('customItemModal')) closeCustomItemModal();
 };
 
 /* ---- Spinner ---- */
