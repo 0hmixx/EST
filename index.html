@@ -2250,6 +2250,7 @@ const modules = {
       ], def:'10'},
       {id:'tieSpacing', label:'Tie spacing (lower)', unit:'mm', def:0},
       {id:'tieSpacingUpper', label:'Tie spacing (upper)', unit:'mm', def:0},
+      {id:'colCount', label:'Number of columns', unit:'pcs', def:1},
       {id:'slabLen', label:'Slab length', unit:'m', def:0},
       {id:'slabWid', label:'Slab width', unit:'m', def:0},
       {id:'thk', label:'Thickness', unit:'mm', def:0},
@@ -2273,7 +2274,7 @@ const modules = {
     fieldGroups:{
       bar:['type','dia','totalLen','stockLen'],
       beam:['type','span','b','h','topDia','topCount','botDia','botCount','stirrupDia','stirrupSpacing'],
-      column:['type','colH','b','d','mainDia','mainCount','tieDia','tieSpacing','tieSpacingUpper'],
+      column:['type','colCount','colH','b','d','mainDia','mainCount','tieDia','tieSpacing','tieSpacingUpper'],
       slab:['type','slabLen','slabWid','thk','mainDia','mainSpacing','tempDia','tempSpacing'],
       footing:['type','fLen','fWid','dir1Dia','dir1Spacing','dir2Dia','dir2Spacing'],
     },
