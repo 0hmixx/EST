@@ -6,7 +6,7 @@
 <title>Simplified Construction Estimate — Calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -50,7 +50,7 @@
     --transition:0.18s ease;
     --font-sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,sans-serif;
     --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,monospace;
-    --font-display:'Big Shoulders Display',sans-serif;
+    --font-display:'Plus Jakarta Sans',sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
@@ -1772,7 +1772,7 @@
       <div class="login-logo">
         <div class="login-logo-icon">E</div>
       </div>
-      <h1 class="login-title">Estimate Pro</h1>
+      <h1 class="login-title">Roughly Right</h1>
       <p class="login-subtitle">Construction estimating<br>made simple.</p>
       <button class="login-btn" id="loginBtn">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" class="login-btn-icon">
@@ -1960,6 +1960,7 @@
 let activeTab = 'excavation';
 let ledger = []; // {id, item, qty, unit, cost}
 let ledgerIdSeq = 1;
+let calcState = {}; // { moduleName: { vals: {}, coeffs: {} } }
 
 /* ---------------- price database ---------------- */
 let priceDB = JSON.parse(localStorage.getItem('priceDB') || '{}');
@@ -3394,6 +3395,7 @@ function createNavItem(key, icon){
   b.dataset.key = key;
   b.innerHTML = `<span class="icon">${icon}</span>${modules[key]?.label||key}`;
   b.onclick = ()=>{
+    saveCalcState();
     activeTab = key;
     renderTabs();
     renderPanel();
@@ -4052,6 +4054,23 @@ function renderPanel(){
     left.appendChild(wrap);
   });
 
+  // Restore saved calculator state
+  if(calcState[activeTab]){
+    const saved = calcState[activeTab];
+    m.fields.forEach(f=>{
+      const el = document.getElementById('f_'+f.id);
+      if(el && saved.vals[f.id] !== undefined){
+        el.value = saved.vals[f.id];
+      }
+    });
+    m.coeffs.forEach(cc=>{
+      const el = document.getElementById('c_'+cc.id);
+      if(el && saved.coeffs[cc.id] !== undefined){
+        el.value = saved.coeffs[cc.id];
+      }
+    });
+  }
+
   if(m.fieldGroups){
     const selectId = m.fieldGroupSelect;
     const applyFieldGroups = ()=>{
@@ -4174,6 +4193,13 @@ function renderPanel(){
     return c;
   }
 
+  function saveCalcState(){
+    calcState[activeTab] = { vals: readVals(), coeffs: readCoeffs() };
+    // Debounced save to Firestore
+    clearTimeout(saveCalcState._timer);
+    saveCalcState._timer = setTimeout(()=>{ if(currentUser) saveUserData(); }, 2000);
+  }
+
   let lastResults = [];
   function recompute(){
     const v = readVals(), c = readCoeffs();
@@ -4207,6 +4233,8 @@ function renderPanel(){
   panel.querySelectorAll('input,select').forEach(el=>{
     el.addEventListener('input', recompute);
     el.addEventListener('change', recompute);
+    el.addEventListener('input', saveCalcState);
+    el.addEventListener('change', saveCalcState);
   });
   document.getElementById('addBtn').onclick = ()=>{
     let count = 0;
@@ -4504,7 +4532,7 @@ function generatePDF(){
     doc.setFontSize(7);
     doc.setFont('helvetica','normal');
     doc.setTextColor(140, 140, 140);
-    doc.text('ESTIMATE PRO  |  Construction Cost Estimate  |  ' + (projectInfo.title || 'Untitled Project'), marginL, pageH - 8);
+    doc.text('ROUGHLY RIGHT  |  Construction Cost Estimate  |  ' + (projectInfo.title || 'Untitled Project'), marginL, pageH - 8);
     doc.text('Page ' + pNum + ' of ' + pTotal, pageW - marginR, pageH - 8, {align:'right'});
     doc.setDrawColor(220, 220, 220);
     doc.line(marginL, pageH - 12, pageW - marginR, pageH - 12);
@@ -4547,7 +4575,7 @@ function generatePDF(){
   doc.setFont('helvetica','bold');
   doc.setFontSize(8);
   doc.setTextColor(59, 130, 246);
-  doc.text('ESTIMATE PRO', marginL, 18);
+  doc.text('ROUGHLY RIGHT', marginL, 18);
   
   doc.setFontSize(28);
   doc.setTextColor(25, 35, 50);
@@ -4870,7 +4898,7 @@ function exportExcel(){
   // ============ SHEET 1: SUMMARY ============
   const refNo2 = refNo;
   const summaryData = [
-    ['ESTIMATE PRO', '', '', ''],
+    ['ROUGHLY RIGHT', '', '', ''],
     ['', '', '', ''],
     ['CONSTRUCTION COST ESTIMATE', '', '', ''],
     ['', '', '', ''],
@@ -4898,7 +4926,7 @@ function exportExcel(){
   wsSummary['!cols'] = [{wch:22},{wch:35},{wch:15},{wch:15}];
   
   // Apply styles
-  wsSummary['A1'] = {t:'s',v:'ESTIMATE PRO',s:{font:{bold:true,size:16,color:{rgb:'3B82F6'}}}};
+  wsSummary['A1'] = {t:'s',v:'ROUGHLY RIGHT',s:{font:{bold:true,size:16,color:{rgb:'3B82F6'}}}};
   wsSummary['A3'] = {t:'s',v:'CONSTRUCTION COST ESTIMATE',s:{font:{bold:true,size:14,color:{rgb:'19232E'}}}};
   wsSummary['A5'] = {t:'s',v:'PROJECT INFORMATION',s:{font:{bold:true,size:11,color:{rgb:'3B82F6'}}}};
   wsSummary['A7'] = {t:'s',v:'Project Name:',s:labelStyle};
@@ -5428,6 +5456,8 @@ auth.onAuthStateChanged(user => {
     ledger = [];
     ledgerIdSeq = 1;
     priceDB = {};
+    calcState = {};
+    activeTab = 'excavation';
     document.getElementById('projTitle').value = '';
     document.getElementById('projLocation').value = '';
     document.getElementById('projOwner').value = '';
@@ -5538,6 +5568,13 @@ function loadUserData(){
         };
         updateHeader();
       }
+      // Load calculator state
+      if(data.calcState && typeof data.calcState === 'object'){
+        calcState = data.calcState;
+      }
+      if(data.activeTab && modules[data.activeTab]){
+        activeTab = data.activeTab;
+      }
       renderPanel();
       renderLedger();
     }
@@ -5564,6 +5601,8 @@ function saveUserData(){
     ledger: ledger,
     priceDB: priceDB,
     ledgerIdSeq: ledgerIdSeq,
+    calcState: calcState,
+    activeTab: activeTab,
     lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
   }, { merge: true }).catch(err => {
     console.error('Save failed:', err);
