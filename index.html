@@ -2060,7 +2060,11 @@ const modules = {
       {id:'cB', label:'Class B — cement / sand / gravel per m³', unit:'bags, m³, m³', def:'7.5,0.53,1.06'},
       {id:'cC', label:'Class C — cement / sand / gravel per m³', unit:'bags, m³, m³', def:'6.0,0.55,1.10'},
       {id:'wastePct', label:'Wastage allowance', unit:'%', def:5},
-      {id:'colConcCover', label:'Column concrete cover', unit:'mm', def:40},
+      {id:'colConcCover', label:'Column concrete cover', type:'select', options:[
+        {v:'25', t:'25mm — Not exposed (NSCP §411.4.1.1)'},
+        {v:'40', t:'40mm — Exposed to weather (NSCP §411.4.1.1)'},
+        {v:'75', t:'75mm — Cast against earth (NSCP §411.4.1.1)'},
+      ], def:'40'},
       {id:'colRebarWastePct', label:'Column rebar waste / lap allowance', unit:'%', def:10},
     ],
     compute(v,c){
@@ -2088,11 +2092,12 @@ const modules = {
         const colH = v.thk;
         const b = v.len * 1000;
         const d = v.wid * 1000;
+        const cover = Number(c.colConcCover) || 40;
         const kgPerM_main = (v.colMainDia*v.colMainDia)/162;
         const kgPerM_tie = (v.colTieDia*v.colTieDia)/162;
         const mainBarLen = colH * rw;
         const mainWeightPerCol = mainBarLen * v.colMainCount * kgPerM_main;
-        const tiePerimeter = 2*((b - 2*c.colConcCover) + (d - 2*c.colConcCover))/1000 + 24*v.colTieDia/1000;
+        const tiePerimeter = 2*((b - 2*cover) + (d - 2*cover))/1000 + 10*v.colTieDia/1000;
         const colTieSpacing = v.colTieSpacing > 0 ? v.colTieSpacing : 100;
         const tieCountPerCol = Math.ceil(colH*1000/colTieSpacing) + 1;
         const tieWeightPerCol = tieCountPerCol * tiePerimeter * kgPerM_tie;
@@ -2121,7 +2126,7 @@ const modules = {
       {id:'len', label:'Wall length', unit:'m', def:0},
       {id:'hgt', label:'Wall height', unit:'m', def:0},
       {id:'thk', label:'CHB thickness', type:'select', options:[
-        {v:'4', t:'4 inch'}, {v:'6', t:'6 inch'},
+        {v:'4', t:'4 inch'}, {v:'5', t:'5 inch'}, {v:'6', t:'6 inch'},
       ], def:'4'},
       {id:'horizDia', label:'Horizontal bar diameter', type:'select', options:[
         {v:'10',t:'10 mm'},{v:'12',t:'12 mm'},
@@ -2135,6 +2140,7 @@ const modules = {
     coeffs:[
       {id:'pcsPerM2', label:'CHB pieces per m²', unit:'pcs', def:12.5},
       {id:'cement4', label:'Mortar cement, 4" wall', unit:'bags / m²', def:0.5},
+      {id:'cement5', label:'Mortar cement, 5" wall', unit:'bags / m²', def:0.55},
       {id:'cement6', label:'Mortar cement, 6" wall', unit:'bags / m²', def:0.6},
       {id:'sandPerM2', label:'Mortar sand', unit:'m³ / m²', def:0.03},
       {id:'wastePct', label:'Wastage allowance', unit:'%', def:5},
@@ -2144,7 +2150,7 @@ const modules = {
       const area = v.len*v.hgt;
       const waste = 1 + c.wastePct/100;
       const pcs = area*c.pcsPerM2*waste;
-      const cementRate = v.thk==='4' ? c.cement4 : c.cement6;
+      const cementRate = v.thk==='4' ? c.cement4 : v.thk==='5' ? c.cement5 : c.cement6;
       const cement = area*cementRate*waste;
       const sand = area*c.sandPerM2*waste;
       const rw = 1 + c.rebarWastePct/100;
@@ -2297,13 +2303,19 @@ const modules = {
       footing:['type','footingCount','fLen','fWid','dir1Dia','dir1Spacing','dir2Dia','dir2Spacing'],
     },
     coeffs:[
-      {id:'concreteCover', label:'Concrete cover', unit:'mm', def:40},
+      {id:'concreteCover', label:'Concrete cover', type:'select', options:[
+        {v:'25', t:'25mm — Not exposed (NSCP §411.4.1.1)'},
+        {v:'40', t:'40mm — Exposed to weather (NSCP §411.4.1.1)'},
+        {v:'75', t:'75mm — Cast against earth (NSCP §411.4.1.1)'},
+      ], def:'40'},
       {id:'wastePct', label:'Waste / lap allowance', unit:'%', def:10},
       {id:'tieWirePerKg', label:'Tie wire', unit:'kg per kg rebar', def:0.025},
+      {id:'midZoneTieSpacing', label:'Mid-zone tie spacing (column)', unit:'mm', def:200, hint:'NSCP §418.9.2.3: ≤ least dim, ≤ 6db, or ≤ 100mm in hinge zone'},
     ],
     compute(v,c){
       const waste = 1 + c.wastePct/100;
       const stockLen = (v.stockLen > 0) ? v.stockLen : 6;
+      const cover = Number(c.concreteCover) || 40;
       if(v.type==='bar'){
         const lenNeeded = v.totalLen*waste;
         const kgPerM = (v.dia*v.dia)/162;
@@ -2326,7 +2338,7 @@ const modules = {
         const topWeightPerBeam = barLen * v.topCount * kgPerM_top;
         const stirrupSpacing = v.stirrupSpacing > 0 ? v.stirrupSpacing : 100;
         const stirrupsPerBeam = Math.ceil(v.span*1000/stirrupSpacing) + 1;
-        const stirrupPerimeter = 2*((v.b - 2*c.concreteCover) + (v.h - 2*c.concreteCover))/1000 + 24*v.stirrupDia/1000;
+        const stirrupPerimeter = 2*((v.b - 2*cover) + (v.h - 2*cover))/1000 + 10*v.stirrupDia/1000;
         const stirrupWeightPerBeam = stirrupsPerBeam * stirrupPerimeter * kgPerM_stir;
         const totalWeightPerBeam = botWeightPerBeam + topWeightPerBeam + stirrupWeightPerBeam;
         const botBarCountPerBeam = Math.ceil((v.span*waste) / stockLen) * v.botCount;
@@ -2351,7 +2363,7 @@ const modules = {
         const kgPerM_main = (v.mainDia*v.mainDia)/162;
         const kgPerM_tie = (v.tieDia*v.tieDia)/162;
         const mainWeightPerCol = barLen * v.mainCount * kgPerM_main;
-        const tiePerimeter = 2*((v.b - 2*c.concreteCover) + (v.d - 2*c.concreteCover))/1000 + 24*v.tieDia/1000;
+        const tiePerimeter = 2*((v.b - 2*cover) + (v.d - 2*cover))/1000 + 10*v.tieDia/1000;
         const lowerZone = v.colH * 0.3;
         const upperZone = v.colH * 0.3;
         const midZone = v.colH - lowerZone - upperZone;
@@ -2359,7 +2371,7 @@ const modules = {
         const tieSpacingUpper = v.tieSpacingUpper > 0 ? v.tieSpacingUpper : 100;
         const tiesLower = Math.ceil(lowerZone*1000/tieSpacing) + 1;
         const tiesUpper = Math.ceil(upperZone*1000/tieSpacingUpper) + 1;
-        const tiesMid = midZone > 0 ? Math.ceil(midZone*1000/200) + 1 : 0;
+        const tiesMid = midZone > 0 ? Math.ceil(midZone*1000/c.midZoneTieSpacing) + 1 : 0;
         const tiesPerCol = tiesLower + tiesUpper + tiesMid;
         const tieWeightPerCol = tiesPerCol * tiePerimeter * kgPerM_tie;
         const totalWeightPerCol = mainWeightPerCol + tieWeightPerCol;
@@ -2465,9 +2477,6 @@ const modules = {
       {id:'coats', label:'Number of coats (if custom)', unit:'', def:0},
     ],
     coeffs:[
-      {id:'primerCoverage', label:'Primer coverage', unit:'sq.m. per liter', def:10},
-      {id:'topcoatCoverage', label:'Topcoat coverage', unit:'sq.m. per liter', def:8},
-      {id:'surfacerCoverage', label:'Surfacer / filler coverage', unit:'sq.m. per liter', def:6},
       {id:'primerPerM2', label:'Primer (by area)', unit:'liters / sq.m.', def:0.1},
       {id:'topcoatPerM2', label:'Topcoat (by area)', unit:'liters / sq.m.', def:0.125},
       {id:'surfacerPerM2', label:'Surfacer / filler (by area)', unit:'liters / sq.m.', def:0.17},
@@ -2622,7 +2631,6 @@ const modules = {
       {id:'screwsPerSheet', label:'Screws / rivets per sheet', unit:'pcs', def:8},
       {id:'wastePct', label:'Wastage / end-lap allowance', unit:'%', def:10},
       {id:'ridgeCapPerM', label:'Ridge cap length', unit:'m per m ridge', def:1.0},
-      {id:'purlinSpacing', label:'Purlin spacing', unit:'m', def:0.6},
       {id:'purlinPerM2', label:'Purlin (by roof area)', unit:'kg / sq.m.', def:1.5},
       {id:'gutterPerM', label:'Gutter', unit:'m per m eave', def:1.0},
       {id:'downspoutPer50M2', label:'Downspout', unit:'pcs per 50 sq.m.', def:1},
@@ -2868,18 +2876,24 @@ const modules = {
   ceiling: {
     label:'Ceiling',
     title:'Ceiling Works',
-    desc:'Metal furring, ceiling boards, hangers, and fasteners for a suspended ceiling area.',
+    desc:'Metal furring, carrying channels, wall angles, ceiling boards, hangers, and fasteners for a suspended ceiling area.',
     fields:[
       {id:'area', label:'Ceiling area', unit:'sq.m.', def:0},
+      {id:'ceilLen', label:'Ceiling length', unit:'m', def:0},
+      {id:'ceilWid', label:'Ceiling width', unit:'m', def:0},
       {id:'boardType', label:'Board type', type:'select', options:[
-        {v:'gypsum', t:'Gypsum Board'},
+        {v:'gypsum', t:'Gypsum Board (interior)'},
         {v:'cement', t:'Cement Board'},
-        {v:'fiberglass', t:'Fiberglass Board'},
+        {v:'pvc', t:'PVC Panel (exterior)'},
+        {v:'fiberCement', t:'Fiber Cement Board (exterior)'},
+        {v:'metal', t:'Metal Panel (exterior)'},
       ], def:'gypsum'},
-      {id:'perimeter', label:'Perimeter (for angle molding)', unit:'m', def:0},
+      {id:'perimeter', label:'Perimeter (for wall angles)', unit:'m', def:0},
     ],
     coeffs:[
-      {id:'furringPerM2', label:'Metal furring', unit:'running m / sq.m.', def:2.5},
+      {id:'furringPerM2', label:'Furring channel', unit:'running m / sq.m.', def:2.5},
+      {id:'carrySpacing', label:'Carrying channel spacing', unit:'m', def:1.2, hint:'Typical: 1.2m on-center'},
+      {id:'carryLen', label:'Carrying channel stock length', unit:'m', def:3.6, hint:'Standard: 3.6m'},
       {id:'hangerPerM2', label:'Hangers', unit:'pcs / sq.m.', def:2},
       {id:'screwsPerM2', label:'Screws', unit:'pcs / sq.m.', def:4},
       {id:'wastePct', label:'Wastage allowance', unit:'%', def:5},
@@ -2888,17 +2902,34 @@ const modules = {
       const waste = 1 + c.wastePct/100;
       const boards = v.area * waste;
       const furring = v.area * c.furringPerM2;
+
+      /* carrying channels: run along ceiling width, spaced along length */
+      const carryCount = v.ceilLen > 0 && c.carrySpacing > 0
+        ? Math.ceil(v.ceilLen / c.carrySpacing) + 1 : 0;
+      const carryTotalLen = carryCount * (v.ceilWid || 0);
+      const carryPcs = c.carryLen > 0 ? Math.ceil(carryTotalLen / c.carryLen) : 0;
+
+      /* wall angles: run along perimeter, 3m stock length */
+      const wallAnglePcs = v.perimeter > 0 ? Math.ceil(v.perimeter / 3) : 0;
+
       const hangers = Math.ceil(v.area * c.hangerPerM2);
       const screws = Math.ceil(v.area * c.screwsPerM2);
+      const boardLabel = {
+        gypsum:'Gypsum board', cement:'Cement board',
+        pvc:'PVC panel', fiberCement:'Fiber cement board', metal:'Metal panel'
+      };
       const results = [
-        {item:`${v.boardType==='gypsum'?'Gypsum':v.boardType==='cement'?'Cement':'Fiberglass'} board`, qty:boards, unit:'sq.m.'},
-        {item:'Metal furring', qty:furring, unit:'running m'},
-        {item:'Hangers', qty:hangers, unit:'pcs'},
-        {item:'Screws', qty:screws, unit:'pcs'},
+        {item:boardLabel[v.boardType]||'Ceiling board', qty:boards, unit:'sq.m.'},
+        {item:'Furring channel', qty:furring, unit:'running m'},
       ];
-      if(v.perimeter > 0){
-        results.push({item:'Angle molding', qty:v.perimeter, unit:'m'});
+      if(carryPcs > 0){
+        results.push({item:'Carrying channel', qty:carryPcs, unit:'pcs'});
       }
+      if(wallAnglePcs > 0){
+        results.push({item:'Wall angle (L-angle)', qty:wallAnglePcs, unit:'pcs'});
+      }
+      results.push({item:'Hangers', qty:hangers, unit:'pcs'});
+      results.push({item:'Screws', qty:screws, unit:'pcs'});
       return results;
     }
   },
@@ -3054,6 +3085,261 @@ const modules = {
     coeffs:[],
     compute(){ return []; }
   },
+
+  /* ====================== TRUSS ====================== */
+  truss: {
+    label: 'Truss',
+    title: 'Roof Truss Works',
+    desc: 'Steel or wood truss members, purlins, connection plates, and fasteners. Note: Web member count simplified — actual count depends on truss configuration (Pratt, Howe, Fink, etc.).',
+    fields: [
+      {id:'trussType', label:'Truss type', type:'select', options:[
+        {v:'steel', t:'Steel Truss'},
+        {v:'wood', t:'Wood Truss'},
+        {v:'purlin', t:'Purlin Layout'},
+      ], def:'steel'},
+      {id:'span', label:'Truss span', unit:'m', def:0},
+      {id:'trussH', label:'Truss height', unit:'m', def:0},
+      {id:'trussSpacing', label:'Truss spacing (on-center)', unit:'m', def:0},
+      {id:'trussCount', label:'Number of trusses', unit:'pcs', def:0},
+      {id:'panelCount', label:'Number of panels', unit:'pcs', def:0},
+      {id:'roofAngle', label:'Roof pitch angle', unit:'deg', def:30},
+      /* steel fields */
+      {id:'topSection', label:'Top chord section', type:'select', options:[
+        {v:'L50x50x6', t:'L50×50×6 (4.47 kg/m)'},
+        {v:'L65x65x6', t:'L65×65×6 (5.93 kg/m)'},
+        {v:'L75x75x8', t:'L75×75×8 (8.88 kg/m)'},
+        {v:'SHS50x50x3', t:'SHS 50×50×3 (4.25 kg/m)'},
+        {v:'SHS75x75x4', t:'SHS 75×75×4 (6.88 kg/m)'},
+      ], def:'L65x65x6'},
+      {id:'botSection', label:'Bottom chord section', type:'select', options:[
+        {v:'L50x50x6', t:'L50×50×6 (4.47 kg/m)'},
+        {v:'L65x65x6', t:'L65×65×6 (5.93 kg/m)'},
+        {v:'L75x75x8', t:'L75×75×8 (8.88 kg/m)'},
+        {v:'SHS50x50x3', t:'SHS 50×50×3 (4.25 kg/m)'},
+        {v:'SHS75x75x4', t:'SHS 75×75×4 (6.88 kg/m)'},
+      ], def:'L65x65x6'},
+      {id:'webSection', label:'Web member section', type:'select', options:[
+        {v:'L50x50x6', t:'L50×50×6 (4.47 kg/m)'},
+        {v:'L65x65x6', t:'L65×65×6 (5.93 kg/m)'},
+        {v:'SHS50x50x3', t:'SHS 50×50×3 (4.25 kg/m)'},
+      ], def:'L50x50x6'},
+      {id:'gussetThk', label:'Gusset plate thickness', unit:'mm', def:6},
+      {id:'gussetLen', label:'Gusset plate length', unit:'mm', def:150, hint:'Typical: 100-200mm'},
+      {id:'gussetWid', label:'Gusset plate width', unit:'mm', def:150, hint:'Typical: 100-200mm'},
+      {id:'boltPerJoint', label:'Bolts per joint', unit:'pcs', def:2},
+      /* wood fields */
+      {id:'lumberSize', label:'Lumber size', type:'select', options:[
+        {v:'2x2', t:'2"×2" (50×50mm)'},
+        {v:'2x3', t:'2"×3" (50×75mm)'},
+        {v:'2x4', t:'2"×4" (50×100mm)'},
+        {v:'2x6', t:'2"×6" (50×150mm)'},
+      ], def:'2x4'},
+      {id:'nailSize', label:'Nail size', type:'select', options:[
+        {v:'2', t:'2" (50mm)'},
+        {v:'3', t:'3" (75mm)'},
+        {v:'4', t:'4" (100mm)'},
+      ], def:'3'},
+      /* purlin fields */
+      {id:'purlinProfile', label:'Purlin profile', type:'select', options:[
+        {v:'C75', t:'C-Channel C75 (1.50 kg/m)'},
+        {v:'C100', t:'C-Channel C100 (2.00 kg/m)'},
+        {v:'Z75', t:'Z-Profile Z75 (1.60 kg/m)'},
+        {v:'L50x50x6', t:'Angle L50×50×6 (4.47 kg/m)'},
+      ], def:'C75'},
+      {id:'roofLen', label:'Roof length (along ridge)', unit:'m', def:0},
+      {id:'purlinSpacing', label:'Purlin spacing (on-center)', unit:'m', def:0},
+      {id:'purlinCount', label:'Number of purlins', unit:'pcs', def:0},
+    ],
+    fieldGroupSelect: 'trussType',
+    fieldGroups: {
+      steel:  ['trussType','span','trussH','trussSpacing','trussCount','panelCount','roofAngle','topSection','botSection','webSection','gussetThk','gussetLen','gussetWid','boltPerJoint'],
+      wood:   ['trussType','span','trussH','trussSpacing','trussCount','panelCount','roofAngle','lumberSize','nailSize'],
+      purlin: ['trussType','roofLen','purlinSpacing','purlinCount','purlinProfile'],
+    },
+    coeffs: [
+      {id:'steelWaste', label:'Steel waste / lap allowance', unit:'%', def:10},
+      {id:'weldRodRate', label:'Welding rods per kg steel', unit:'kg/kg', def:0.05, hint:'DPWH standard: 50g per kg steel'},
+      {id:'lumberWaste', label:'Lumber waste allowance', unit:'%', def:10},
+      {id:'nailPerJoint', label:'Nails per joint', unit:'pcs', def:4, hint:'NSCP 2015 minimum'},
+      {id:'purlinWaste', label:'Purlin waste allowance', unit:'%', def:5},
+      {id:'connPlateWeight', label:'Connection plate weight', unit:'kg/pcs', def:0.5, hint:'Per plate (~6mm thick)'},
+    ],
+    compute(v, c) {
+      const waste = 1 + c.steelWaste / 100;
+      const nTruss = Math.max(1, v.trussCount || 1);
+      const nPanel = Math.max(1, v.panelCount || 1);
+      const angleRad = (v.roofAngle || 30) * Math.PI / 180;
+
+      /* --- Philippine section kg/m lookup --- */
+      const secKg = {
+        'L50x50x6': 4.47, 'L65x65x6': 5.93, 'L75x75x8': 8.88,
+        'SHS50x50x3': 4.25, 'SHS75x75x4': 6.88,
+      };
+      const purlinKg = { 'C75': 1.50, 'C100': 2.00, 'Z75': 1.60, 'L50x50x6': 4.47 };
+
+      /* === STEEL TRUSS === */
+      if (v.trussType === 'steel') {
+        const span = Math.max(0.1, v.span || 0);
+        const h = Math.max(0.1, v.trussH || 0);
+        const spacing = Math.max(0.1, v.trussSpacing || 0);
+        const panels = Math.max(1, nPanel);
+
+        /* member lengths per truss */
+        const topLenEach = (span / 2) / Math.cos(angleRad);
+        const botLenEach = span;
+        const panelLen = span / panels;
+        const webVertLen = h;
+        const webDiagLen = Math.sqrt(panelLen * panelLen + h * h);
+        const webCount = panels + 1;
+
+        /* total lengths */
+        const topTotal = topLenEach * 2 * nTruss * waste;
+        const botTotal = botLenEach * nTruss * waste;
+        const webTotal = (webVertLen * webCount + webDiagLen * panels) * nTruss * waste;
+
+        /* weights */
+        const topWt = topTotal * (secKg[v.topSection] || 5.93);
+        const botWt = botTotal * (secKg[v.botSection] || 5.93);
+        const webWt = webTotal * (secKg[v.webSection] || 4.47);
+        const totalSteel = topWt + botWt + webWt;
+
+        /* connections */
+        const joints = panels + 1;
+        const gussetAreaM2 = (v.gussetLen * v.gussetWid) / 1000000;
+        const gussets = nTruss * joints * gussetAreaM2 * 2;
+        const bolts = nTruss * joints * v.boltPerJoint;
+        const connPlateWt = nTruss * joints * 2 * c.connPlateWeight;
+        const totalSteelWithConn = totalSteel + connPlateWt;
+        const weldRods = totalSteelWithConn * c.weldRodRate;
+        const connPlates = nTruss * joints * 2;
+
+        return [
+          {item:'Truss top chord', qty:+topWt.toFixed(2), unit:'kg'},
+          {item:'Truss bottom chord', qty:+botWt.toFixed(2), unit:'kg'},
+          {item:'Truss web members', qty:+webWt.toFixed(2), unit:'kg'},
+          {item:'Connection plates', qty:+connPlateWt.toFixed(2), unit:'kg'},
+          {item:'Total truss steel weight', qty:+totalSteelWithConn.toFixed(2), unit:'kg'},
+          {item:'Gusset plates', qty:+gussets.toFixed(2), unit:'sq.m.'},
+          {item:'Bolts', qty:bolts, unit:'pcs'},
+          {item:'Welding rods', qty:+weldRods.toFixed(2), unit:'kg'},
+        ];
+      }
+
+      /* === WOOD TRUSS === */
+      if (v.trussType === 'wood') {
+        const span = Math.max(0.1, v.span || 0);
+        const h = Math.max(0.1, v.trussH || 0);
+        const lumberWaste = 1 + c.lumberWaste / 100;
+        const panels = Math.max(1, nPanel);
+
+        const topLenEach = (span / 2) / Math.cos(angleRad);
+        const botLenEach = span;
+        const webVertLen = h;
+        const panelLen = span / panels;
+        const webDiagLen = Math.sqrt(panelLen * panelLen + h * h);
+        const webCount = panels + 1;
+
+        const topTotal = topLenEach * 2 * nTruss * lumberWaste;
+        const botTotal = botLenEach * nTruss * lumberWaste;
+        const webTotal = (webVertLen * webCount + webDiagLen * panels) * nTruss * lumberWaste;
+
+        const topPcs = Math.ceil(topTotal / 6);
+        const botPcs = Math.ceil(botTotal / 6);
+        const webPcs = Math.ceil(webTotal / 6);
+        const totalPcs = topPcs + botPcs + webPcs;
+
+        const joints = (panels + 1) * nTruss;
+        const nails = joints * c.nailPerJoint;
+
+        return [
+          {item:`${v.lumberSize} top chord lumber`, qty:topPcs, unit:'pcs'},
+          {item:`${v.lumberSize} bottom chord lumber`, qty:botPcs, unit:'pcs'},
+          {item:`${v.lumberSize} web member lumber`, qty:webPcs, unit:'pcs'},
+          {item:'Total lumber pieces', qty:totalPcs, unit:'pcs'},
+          {item:`Nails (${v.nailSize}")`, qty:nails, unit:'pcs'},
+        ];
+      }
+
+      /* === PURLIN LAYOUT === */
+      if (v.trussType === 'purlin') {
+        const purlinWaste = 1 + c.purlinWaste / 100;
+        const nPurlin = Math.max(1, v.purlinCount || 1);
+        const totalLen = (v.roofLen || 0) * nPurlin * purlinWaste;
+        const wt = totalLen * (purlinKg[v.purlinProfile] || 1.5);
+        const connPlates = nPurlin;
+        return [
+          {item:`${v.purlinProfile} purlin`, qty:+totalLen.toFixed(2), unit:'running m'},
+          {item:'Purlins', qty:nPurlin, unit:'pcs'},
+          {item:'Purlin weight', qty:+wt.toFixed(2), unit:'kg'},
+          {item:'Connection plates', qty:connPlates, unit:'pcs'},
+        ];
+      }
+
+      return [];
+    }
+  },
+
+  /* ====================== LUMBER ====================== */
+  lumber: {
+    label: 'Lumber',
+    title: 'Lumber Works',
+    desc: 'Lumber volume and pieces for framing, blocking, and general carpentry. Based on Fajardo estimating method.',
+    fields: [
+      {id:'lumberType', label:'Lumber type', type:'select', options:[
+        {v:'common', t:'Common Lumber (misc sizes)'},
+        {v:'framing', t:'Framing Lumber (2× series)'},
+        {v:'plywood', t:'Plywood / CDX'},
+      ], def:'common'},
+      {id:'len', label:'Length', unit:'m', def:0},
+      {id:'wid', label:'Width', unit:'m', def:0},
+      {id:'thk', label:'Thickness', unit:'m', def:0},
+      {id:'count', label:'Quantity', unit:'pcs', def:1},
+      {id:'spacing', label:'Spacing (for framing)', unit:'m', def:0.4, hint:'0.3m, 0.4m, or 0.6m typical'},
+    ],
+    coeffs: [
+      {id:'wastePct', label:'Waste allowance', unit:'%', def:10},
+      {id:'lumberDensity', label:'Lumber density', unit:'kg/cu.m.', def:550, hint:'Softwood: 450-550, Hardwood: 600-800'},
+    ],
+    compute(v, c) {
+      const waste = 1 + c.wastePct / 100;
+      const count = Math.max(1, v.count || 1);
+
+      if (v.lumberType === 'common') {
+        const volEach = v.len * v.wid * v.thk;
+        const volTotal = volEach * count * waste;
+        const weight = volTotal * c.lumberDensity;
+        return [
+          {item:'Lumber volume (each)', qty:+volEach.toFixed(4), unit:'cu.m.', hidden:true},
+          {item:'Lumber volume (total)', qty:+volTotal.toFixed(3), unit:'cu.m.'},
+          {item:'Lumber weight', qty:+weight.toFixed(1), unit:'kg'},
+        ];
+      }
+
+      if (v.lumberType === 'framing') {
+        const volEach = v.len * v.wid * v.thk;
+        const volTotal = volEach * count * waste;
+        const weight = volTotal * c.lumberDensity;
+        const pieces = Math.ceil(count * waste);
+        return [
+          {item:'Framing volume (total)', qty:+volTotal.toFixed(3), unit:'cu.m.', hidden:true},
+          {item:'Lumber pieces', qty:pieces, unit:'pcs'},
+          {item:'Lumber weight', qty:+weight.toFixed(1), unit:'kg'},
+        ];
+      }
+
+      if (v.lumberType === 'plywood') {
+        const areaEach = v.len * v.wid;
+        const areaTotal = areaEach * count * waste;
+        return [
+          {item:'Plywood area (each)', qty:+areaEach.toFixed(2), unit:'sq.m.', hidden:true},
+          {item:'Plywood area (total)', qty:+areaTotal.toFixed(2), unit:'sq.m.'},
+          {item:'Plywood sheets', qty:count, unit:'pcs'},
+        ];
+      }
+
+      return [];
+    }
+  },
 };
 
 /* ---------------- render tabs ---------------- */
@@ -3069,6 +3355,8 @@ const navCategories = {
       {key:'plaster', icon:'🖌'},
       {key:'rebar', icon:'⚙'},
       {key:'formwork', icon:'📐'},
+      {key:'lumber', icon:'🪵'},
+      {key:'truss', icon:'🔺'},
     ]
   },
   finishes: {
@@ -3253,11 +3541,14 @@ function renderPanel(){
       {key:'Lumber: Plywood', unit:'pcs', cat:'Lumber'},
       {key:'Ceiling: Gypsum board', unit:'sq.m.', cat:'Ceiling'},
       {key:'Ceiling: Cement board', unit:'sq.m.', cat:'Ceiling'},
-      {key:'Ceiling: Fiberglass board', unit:'sq.m.', cat:'Ceiling'},
-      {key:'Ceiling: Metal furring', unit:'running m', cat:'Ceiling'},
+      {key:'Ceiling: PVC panel', unit:'sq.m.', cat:'Ceiling'},
+      {key:'Ceiling: Fiber cement board', unit:'sq.m.', cat:'Ceiling'},
+      {key:'Ceiling: Metal panel', unit:'sq.m.', cat:'Ceiling'},
+      {key:'Ceiling: Furring channel', unit:'running m', cat:'Ceiling'},
+      {key:'Ceiling: Carrying channel', unit:'pcs', cat:'Ceiling'},
+      {key:'Ceiling: Wall angle (L-angle)', unit:'pcs', cat:'Ceiling'},
       {key:'Ceiling: Hangers', unit:'pcs', cat:'Ceiling'},
       {key:'Ceiling: Screws', unit:'pcs', cat:'Ceiling'},
-      {key:'Ceiling: Angle molding', unit:'m', cat:'Ceiling'},
       {key:'Steel Works: Steel length (total)', unit:'running m', cat:'Steel Works'},
       {key:'Steel Works: Steel weight', unit:'kg', cat:'Steel Works'},
       {key:'Steel Works: Bolts', unit:'pcs', cat:'Steel Works'},
@@ -3278,6 +3569,22 @@ function renderPanel(){
       {key:'Waterproofing: Roof primer', unit:'liters', cat:'Waterproofing'},
       {key:'Waterproofing: Wet area primer', unit:'liters', cat:'Waterproofing'},
       {key:'Waterproofing: Sealant', unit:'tubes', cat:'Waterproofing'},
+      {key:'Truss: Truss top chord', unit:'kg', cat:'Truss'},
+      {key:'Truss: Truss bottom chord', unit:'kg', cat:'Truss'},
+      {key:'Truss: Truss web members', unit:'kg', cat:'Truss'},
+      {key:'Truss: Total truss steel weight', unit:'kg', cat:'Truss'},
+      {key:'Truss: Gusset plates', unit:'sq.m.', cat:'Truss'},
+      {key:'Truss: Connection plates', unit:'pcs', cat:'Truss'},
+      {key:'Truss: Bolts', unit:'pcs', cat:'Truss'},
+      {key:'Truss: Welding rods', unit:'kg', cat:'Truss'},
+      {key:'Truss: Lumber top chord', unit:'pcs', cat:'Truss'},
+      {key:'Truss: Lumber bottom chord', unit:'pcs', cat:'Truss'},
+      {key:'Truss: Lumber web members', unit:'pcs', cat:'Truss'},
+      {key:'Truss: Total lumber pieces', unit:'pcs', cat:'Truss'},
+      {key:'Truss: Nails', unit:'pcs', cat:'Truss'},
+      {key:'Truss: Purlin', unit:'running m', cat:'Truss'},
+      {key:'Truss: Purlins', unit:'pcs', cat:'Truss'},
+      {key:'Truss: Purlin weight', unit:'kg', cat:'Truss'},
       {key:'Form/Scaffold: Floor area', unit:'sq.m.', cat:'Form/Scaffold'},
       {key:'Form/Scaffold: Steel pipes', unit:'kg', cat:'Form/Scaffold'},
       {key:'Form/Scaffold: Couplers', unit:'pcs', cat:'Form/Scaffold'},
@@ -3941,6 +4248,7 @@ const categoryMap = {
   'Steel Works': 'Structural',
   'Plumbing': 'MEP',
   'Waterproofing': 'Finishes',
+  'Truss': 'Structural',
   'Custom': 'Custom Items',
   'Labor': 'Labor Costs',
   'Equipment': 'Equipment Costs',
@@ -4166,12 +4474,13 @@ function generatePDF(){
     'Steel Works':'Structural Steel Works',
     'Plumbing':'Plumbing Works',
     'Waterproofing':'Waterproofing Works',
+    'Truss':'Roof Truss Works',
     'Custom':'Custom Items',
     'Labor':'Labor Costs',
     'Equipment':'Equipment Costs',
     'Overhead':'Overhead & Profit',
   };
-  const modOrder = ['Excavation','Concrete','CHB Masonry','Plastering','Reinforcement','Painting','Tiling','Roofing','Doors/Windows','Electrical','Form/Scaffold','Lumber','Ceiling','Steel Works','Plumbing','Waterproofing','Custom','Labor','Equipment','Overhead'];
+  const modOrder = ['Excavation','Concrete','CHB Masonry','Plastering','Reinforcement','Painting','Tiling','Roofing','Doors/Windows','Electrical','Form/Scaffold','Lumber','Ceiling','Steel Works','Plumbing','Waterproofing','Truss','Custom','Labor','Equipment','Overhead'];
   
   let grandTotal = 0;
   let itemCount = 0;
@@ -4532,12 +4841,13 @@ function exportExcel(){
     'Steel Works':'Structural Steel Works',
     'Plumbing':'Plumbing Works',
     'Waterproofing':'Waterproofing Works',
+    'Truss':'Roof Truss Works',
     'Custom':'Custom Items',
     'Labor':'Labor Costs',
     'Equipment':'Equipment Costs',
     'Overhead':'Overhead & Profit',
   };
-  const modOrder = ['Excavation','Concrete','CHB Masonry','Plastering','Reinforcement','Painting','Tiling','Roofing','Doors/Windows','Electrical','Form/Scaffold','Lumber','Ceiling','Steel Works','Plumbing','Waterproofing','Custom','Labor','Equipment','Overhead'];
+  const modOrder = ['Excavation','Concrete','CHB Masonry','Plastering','Reinforcement','Painting','Tiling','Roofing','Doors/Windows','Electrical','Form/Scaffold','Lumber','Ceiling','Steel Works','Plumbing','Waterproofing','Truss','Custom','Labor','Equipment','Overhead'];
   
   let grandTotal = 0;
   let itemCount = 0;
