@@ -3343,6 +3343,31 @@ const modules = {
   },
 };
 
+/* ---------------- save calc state (global) ---------------- */
+function saveCalcState(){
+  const m = modules[activeTab];
+  if(!m) return;
+  const v = {};
+  m.fields.forEach(f=>{
+    const el = document.getElementById('f_'+f.id);
+    if(el && el.offsetParent !== null){
+      if(f.type==='select' || f.type==='text'){
+        v[f.id] = el.value;
+      } else {
+        v[f.id] = Math.max(0, parseFloat(el.value)||0);
+      }
+    }
+  });
+  const c = {};
+  m.coeffs.forEach(cc=>{
+    const el = document.getElementById('c_'+cc.id);
+    if(el) c[cc.id] = typeof cc.def==='number' ? Math.max(0, parseFloat(el.value)||0) : el.value;
+  });
+  calcState[activeTab] = { vals: v, coeffs: c };
+  clearTimeout(saveCalcState._timer);
+  saveCalcState._timer = setTimeout(()=>{ if(currentUser) saveUserData(); }, 2000);
+}
+
 /* ---------------- render tabs ---------------- */
 const ADMIN_EMAIL = 'jkylemagdalas21@gmail.com';
 
@@ -4191,13 +4216,6 @@ function renderPanel(){
       c[cc.id] = typeof cc.def==='number' ? Math.max(0, parseFloat(el.value)||0) : el.value;
     });
     return c;
-  }
-
-  function saveCalcState(){
-    calcState[activeTab] = { vals: readVals(), coeffs: readCoeffs() };
-    // Debounced save to Firestore
-    clearTimeout(saveCalcState._timer);
-    saveCalcState._timer = setTimeout(()=>{ if(currentUser) saveUserData(); }, 2000);
   }
 
   let lastResults = [];
