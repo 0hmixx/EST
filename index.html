@@ -3470,7 +3470,6 @@ document.getElementById('sidebarOverlay').onclick = closeMobileSidebar;
 
 /* ---------------- render panel ---------------- */
 function renderPanel(){
-  saveCalcState();
   const m = modules[activeTab];
   const panel = document.getElementById('panel');
   const ledgerEl = document.getElementById('estimateSection');
@@ -4080,37 +4079,6 @@ function renderPanel(){
     left.appendChild(wrap);
   });
 
-  // Restore saved calculator state
-  if(calcState[activeTab]){
-    const saved = calcState[activeTab];
-    m.fields.forEach(f=>{
-      const el = document.getElementById('f_'+f.id);
-      if(el && saved.vals[f.id] !== undefined){
-        el.value = saved.vals[f.id];
-      }
-    });
-    m.coeffs.forEach(cc=>{
-      const el = document.getElementById('c_'+cc.id);
-      if(el && saved.coeffs[cc.id] !== undefined){
-        el.value = saved.coeffs[cc.id];
-      }
-    });
-  }
-
-  if(m.fieldGroups){
-    const selectId = m.fieldGroupSelect;
-    const applyFieldGroups = ()=>{
-      const type = left.querySelector('#f_'+selectId).value;
-      const visible = m.fieldGroups[type] || [];
-      left.querySelectorAll('[data-field-id]').forEach(wrap=>{
-        const fid = wrap.dataset.fieldId;
-        wrap.style.display = visible.includes(fid) ? '' : 'none';
-      });
-    };
-    left.querySelector('#f_'+selectId).addEventListener('change', applyFieldGroups);
-    applyFieldGroups();
-  }
-
   if(m.coeffs.length > 0){
     const refWrap = document.createElement('details');
     refWrap.className = 'ref-values';
@@ -4162,6 +4130,38 @@ function renderPanel(){
     `;
     
     left.appendChild(refWrap);
+  }
+
+  // Restore saved calculator state (after all DOM elements are created)
+  if(calcState[activeTab]){
+    const saved = calcState[activeTab];
+    m.fields.forEach(f=>{
+      const el = document.getElementById('f_'+f.id);
+      if(el && saved.vals[f.id] !== undefined){
+        el.value = saved.vals[f.id];
+      }
+    });
+    m.coeffs.forEach(cc=>{
+      const el = document.getElementById('c_'+cc.id);
+      if(el && saved.coeffs[cc.id] !== undefined){
+        el.value = saved.coeffs[cc.id];
+      }
+    });
+  }
+
+  // Apply fieldGroups after state restore so select value is correct
+  if(m.fieldGroups){
+    const selectId = m.fieldGroupSelect;
+    const applyFieldGroups = ()=>{
+      const type = left.querySelector('#f_'+selectId).value;
+      const visible = m.fieldGroups[type] || [];
+      left.querySelectorAll('[data-field-id]').forEach(wrap=>{
+        const fid = wrap.dataset.fieldId;
+        wrap.style.display = visible.includes(fid) ? '' : 'none';
+      });
+    };
+    left.querySelector('#f_'+selectId).addEventListener('change', applyFieldGroups);
+    applyFieldGroups();
   }
 
   if(m.memberLabels){
