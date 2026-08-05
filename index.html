@@ -5446,15 +5446,20 @@ auth.onAuthStateChanged(user => {
     }).then(doc => {
       const isAdmin = user.email === ADMIN_EMAIL;
       const isActive = doc.exists && doc.data().active === true;
-      hideSpinner();
       if(isAdmin || isActive){
         if(doc.exists && doc.data().projectInfo){
           projectInfo = doc.data().projectInfo;
-          mainApp.style.display = 'block';
-          accessOverlay.style.display = 'none';
-          showUserInfo(user, isAdmin);
-          loadUserData();
+          // Load saved calculator/ledger data BEFORE revealing the app,
+          // so typing can't happen while the fetch is still in flight and
+          // then get wiped out when it resolves and overwrites calcState.
+          loadUserData().finally(() => {
+            hideSpinner();
+            mainApp.style.display = 'block';
+            accessOverlay.style.display = 'none';
+            showUserInfo(user, isAdmin);
+          });
         } else {
+          hideSpinner();
           if(isAdmin){
             mainApp.style.display = 'block';
             if(adminTab) adminTab.style.display = 'block';
@@ -5465,6 +5470,7 @@ auth.onAuthStateChanged(user => {
           }
         }
       } else {
+        hideSpinner();
         mainApp.style.display = 'none';
         accessOverlay.style.display = 'flex';
       }
@@ -5558,8 +5564,8 @@ function updateHeader(){
 
 /* ---- Load user data ---- */
 function loadUserData(){
-  if(!currentUser) return;
-  db.collection('users').doc(currentUser.uid).get().then(doc => {
+  if(!currentUser) return Promise.resolve();
+  return db.collection('users').doc(currentUser.uid).get().then(doc => {
     if(doc.exists){
       const data = doc.data();
       // Validate and load ledger
