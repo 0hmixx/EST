@@ -3470,6 +3470,7 @@ document.getElementById('sidebarOverlay').onclick = closeMobileSidebar;
 
 /* ---------------- render panel ---------------- */
 function renderPanel(){
+  saveCalcState();
   const m = modules[activeTab];
   const panel = document.getElementById('panel');
   const ledgerEl = document.getElementById('estimateSection');
