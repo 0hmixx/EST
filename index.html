@@ -3371,11 +3371,39 @@ function saveCalcState(){
   saveCalcState._timer = setTimeout(()=>{ if(currentUser) saveUserData(); }, 2000);
 }
 
+/* Save ALL modules' visible inputs before any nav switch */
+function saveAllModuleState(){
+  Object.keys(modules).forEach(key=>{
+    const m = modules[key];
+    if(!m || !m.fields || m.fields.length===0) return;
+    const v = {};
+    m.fields.forEach(f=>{
+      const el = document.getElementById('f_'+f.id);
+      if(el){
+        if(f.type==='select' || f.type==='text'){
+          v[f.id] = el.value;
+        } else {
+          v[f.id] = Math.max(0, parseFloat(el.value)||0);
+        }
+      }
+    });
+    const c = {};
+    m.coeffs.forEach(cc=>{
+      const el = document.getElementById('c_'+cc.id);
+      if(el) c[cc.id] = typeof cc.def==='number' ? Math.max(0, parseFloat(el.value)||0) : el.value;
+    });
+    if(Object.keys(v).length > 0 || Object.keys(c).length > 0){
+      calcState[key] = { vals: v, coeffs: c };
+    }
+  });
+  try{ localStorage.setItem('calcState', JSON.stringify(calcState)); }catch(e){}
+}
+
 window.addEventListener('beforeunload', ()=>{
-  try{ saveCalcState(); }catch(e){}
+  try{ saveAllModuleState(); }catch(e){}
 });
 document.addEventListener('visibilitychange', ()=>{
-  if(document.hidden) try{ saveCalcState(); }catch(e){}
+  if(document.hidden) try{ saveAllModuleState(); }catch(e){}
 });
 
 /* ---------------- render tabs ---------------- */
@@ -3430,7 +3458,7 @@ function createNavItem(key, icon){
   b.dataset.key = key;
   b.innerHTML = `<span class="icon">${icon}</span>${modules[key]?.label||key}`;
   b.onclick = ()=>{
-    saveCalcState();
+    saveAllModuleState();
     activeTab = key;
     renderTabs();
     renderPanel();
@@ -4146,13 +4174,13 @@ function renderPanel(){
   if(calcState[activeTab]){
     const saved = calcState[activeTab];
     m.fields.forEach(f=>{
-      const el = document.getElementById('f_'+f.id);
+      const el = left.querySelector('#f_'+f.id);
       if(el && saved.vals[f.id] !== undefined){
         el.value = saved.vals[f.id];
       }
     });
     m.coeffs.forEach(cc=>{
-      const el = document.getElementById('c_'+cc.id);
+      const el = left.querySelector('#c_'+cc.id);
       if(el && saved.coeffs[cc.id] !== undefined){
         el.value = saved.coeffs[cc.id];
       }
@@ -5599,9 +5627,11 @@ function loadUserData(){
         };
         updateHeader();
       }
-      // Load calculator state
+      // Load calculator state - merge with localStorage (prefer local newer values)
       if(data.calcState && typeof data.calcState === 'object'){
-        calcState = data.calcState;
+        Object.keys(data.calcState).forEach(key=>{
+          if(!calcState[key]) calcState[key] = data.calcState[key];
+        });
       }
       if(data.activeTab && modules[data.activeTab]){
         activeTab = data.activeTab;
