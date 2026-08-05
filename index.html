@@ -1961,6 +1961,8 @@ let activeTab = 'excavation';
 let ledger = []; // {id, item, qty, unit, cost}
 let ledgerIdSeq = 1;
 let calcState = {}; // { moduleName: { vals: {}, coeffs: {} } }
+try{ const ls = JSON.parse(localStorage.getItem('calcState')||'null'); if(ls && typeof ls==='object') calcState = ls; }catch(e){}
+let dataLoaded = false;
 
 /* ---------------- price database ---------------- */
 let priceDB = JSON.parse(localStorage.getItem('priceDB') || '{}');
@@ -3364,9 +3366,17 @@ function saveCalcState(){
     if(el) c[cc.id] = typeof cc.def==='number' ? Math.max(0, parseFloat(el.value)||0) : el.value;
   });
   calcState[activeTab] = { vals: v, coeffs: c };
+  try{ localStorage.setItem('calcState', JSON.stringify(calcState)); }catch(e){}
   clearTimeout(saveCalcState._timer);
   saveCalcState._timer = setTimeout(()=>{ if(currentUser) saveUserData(); }, 2000);
 }
+
+window.addEventListener('beforeunload', ()=>{
+  try{ saveCalcState(); }catch(e){}
+});
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden) try{ saveCalcState(); }catch(e){}
+});
 
 /* ---------------- render tabs ---------------- */
 const ADMIN_EMAIL = 'jkylemagdalas21@gmail.com';
@@ -5426,6 +5436,7 @@ document.getElementById('startBtn').onclick = () => {
   projectOverlay.style.display = 'none';
   mainApp.style.display = 'block';
   db.collection('users').doc(currentUser.uid).set({ projectInfo }, { merge: true });
+  dataLoaded = true;
   loadUserData();
   updateHeader();
   showToast('Project created');
@@ -5446,20 +5457,15 @@ auth.onAuthStateChanged(user => {
     }).then(doc => {
       const isAdmin = user.email === ADMIN_EMAIL;
       const isActive = doc.exists && doc.data().active === true;
+      hideSpinner();
       if(isAdmin || isActive){
         if(doc.exists && doc.data().projectInfo){
           projectInfo = doc.data().projectInfo;
-          // Load saved calculator/ledger data BEFORE revealing the app,
-          // so typing can't happen while the fetch is still in flight and
-          // then get wiped out when it resolves and overwrites calcState.
-          loadUserData().finally(() => {
-            hideSpinner();
-            mainApp.style.display = 'block';
-            accessOverlay.style.display = 'none';
-            showUserInfo(user, isAdmin);
-          });
+          mainApp.style.display = 'block';
+          accessOverlay.style.display = 'none';
+          showUserInfo(user, isAdmin);
+          if(!dataLoaded){ dataLoaded = true; loadUserData(); }
         } else {
-          hideSpinner();
           if(isAdmin){
             mainApp.style.display = 'block';
             if(adminTab) adminTab.style.display = 'block';
@@ -5470,7 +5476,6 @@ auth.onAuthStateChanged(user => {
           }
         }
       } else {
-        hideSpinner();
         mainApp.style.display = 'none';
         accessOverlay.style.display = 'flex';
       }
@@ -5483,6 +5488,7 @@ auth.onAuthStateChanged(user => {
     priceDB = {};
     calcState = {};
     activeTab = 'excavation';
+    dataLoaded = false;
     document.getElementById('projTitle').value = '';
     document.getElementById('projLocation').value = '';
     document.getElementById('projOwner').value = '';
@@ -5564,8 +5570,8 @@ function updateHeader(){
 
 /* ---- Load user data ---- */
 function loadUserData(){
-  if(!currentUser) return Promise.resolve();
-  return db.collection('users').doc(currentUser.uid).get().then(doc => {
+  if(!currentUser) return;
+  db.collection('users').doc(currentUser.uid).get().then(doc => {
     if(doc.exists){
       const data = doc.data();
       // Validate and load ledger
