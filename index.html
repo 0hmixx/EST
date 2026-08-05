@@ -3371,39 +3371,11 @@ function saveCalcState(){
   saveCalcState._timer = setTimeout(()=>{ if(currentUser) saveUserData(); }, 2000);
 }
 
-/* Save ALL modules' visible inputs before any nav switch */
-function saveAllModuleState(){
-  Object.keys(modules).forEach(key=>{
-    const m = modules[key];
-    if(!m || !m.fields || m.fields.length===0) return;
-    const v = {};
-    m.fields.forEach(f=>{
-      const el = document.getElementById('f_'+f.id);
-      if(el){
-        if(f.type==='select' || f.type==='text'){
-          v[f.id] = el.value;
-        } else {
-          v[f.id] = Math.max(0, parseFloat(el.value)||0);
-        }
-      }
-    });
-    const c = {};
-    m.coeffs.forEach(cc=>{
-      const el = document.getElementById('c_'+cc.id);
-      if(el) c[cc.id] = typeof cc.def==='number' ? Math.max(0, parseFloat(el.value)||0) : el.value;
-    });
-    if(Object.keys(v).length > 0 || Object.keys(c).length > 0){
-      calcState[key] = { vals: v, coeffs: c };
-    }
-  });
-  try{ localStorage.setItem('calcState', JSON.stringify(calcState)); }catch(e){}
-}
-
 window.addEventListener('beforeunload', ()=>{
-  try{ saveAllModuleState(); }catch(e){}
+  try{ saveCalcState(); }catch(e){}
 });
 document.addEventListener('visibilitychange', ()=>{
-  if(document.hidden) try{ saveAllModuleState(); }catch(e){}
+  if(document.hidden) try{ saveCalcState(); }catch(e){}
 });
 
 /* ---------------- render tabs ---------------- */
@@ -3458,7 +3430,7 @@ function createNavItem(key, icon){
   b.dataset.key = key;
   b.innerHTML = `<span class="icon">${icon}</span>${modules[key]?.label||key}`;
   b.onclick = ()=>{
-    saveAllModuleState();
+    saveCalcState();
     activeTab = key;
     renderTabs();
     renderPanel();
