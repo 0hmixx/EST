@@ -3350,7 +3350,7 @@ function saveCalcState(){
   const v = {};
   m.fields.forEach(f=>{
     const el = document.getElementById('f_'+f.id);
-    if(el && el.offsetParent !== null){
+    if(el){
       if(f.type==='select' || f.type==='text'){
         v[f.id] = el.value;
       } else {
